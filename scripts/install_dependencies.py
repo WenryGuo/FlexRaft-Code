@@ -24,8 +24,8 @@ def install_gtest():
     if not os.path.exists("googletest"):
         subprocess.run("git clone https://github.com/google/googletest.git", shell=True)
     os.chdir("googletest")
-    subprocess.run("cmake3 -B build", shell=True)
-    subprocess.run("cmake3 --build build", shell=True)
+    subprocess.run("cmake -B build", shell=True)
+    subprocess.run("cmake --build build", shell=True)
     os.chdir("build")
     subprocess.run("sudo make install", shell=True)
     os.chdir(root_path)
@@ -82,11 +82,11 @@ def install_libisal():
     os.chdir(root_path)
 
 if __name__ == "__main__":
-    install_gtest()
+    # install_gtest()
     install_rocksdb_dependencies()
-    install_rocksdb()
+    # install_rocksdb()
     install_nasm_assembler()
-    install_libisal()
+    # install_libisal()
     subprocess.run("sudo rm -rf {}".format(root_path), shell=True)
 
 

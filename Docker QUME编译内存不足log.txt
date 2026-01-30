@@ -1,0 +1,546 @@
+ => CACHED [ 1/13] FROM docker.io/library/ubuntu:22.04@sha256:104ae83764a5119017b8e8d6218fa0832b09df65aae7d5a6de29a85d813da2fb                                                      0.0s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/writable_file_writer.cc.o                                                                                  
+ => [internal] load build context                                                                                                                                                   0.2s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/auto_roll_logger.cc.o                                                                                   
+ => => transferring context: 272.36kB                                                                                                                                               0.2s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/event_logger.cc.o                                                                                       
+ => [ 2/13] RUN sed -i 's@http://.*.ubuntu.com@http://mirrors.ustc.edu.cn@' /etc/apt/sources.list &&     apt-get update &&     apt-get install -y --no-install-recommends         148.3s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/log_buffer.cc.o                                                                                         
+ => [ 3/13] COPY googletest /tmp/googletest                                                                                                                                         0.1s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/arena.cc.o                                                                                               
+ => [ 4/13] RUN cd /tmp/googletest &&     cmake -B build -DCMAKE_INSTALL_PREFIX=/usr &&     cmake --build build &&     cd build &&     make install &&     rm -rf /tmp/googletest  64.1s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/concurrent_arena.cc.o                                                                                    
+ => [ 5/13] COPY scripts/install_dependencies.py /tmp/                                                                                                                            [+] Building 5141.6s (11/17)                                                                                                                                              docker:default6/13] RUN python3 /tmp/install_dependencies.py                                                                                                                              
+ => [internal] load .dockerignore                                                                                                                                                   0.0s7/13] COPY rocksdb /tmp/rocksdb                                                                                                                                             
+ => => transferring context: 2B                                                                                                                                                     0.0s8/13] RUN cd /tmp/rocksdb &&     cmake -B build -DCMAKE_INSTALL_PREFIX=/usr &&     cmake --build build &&     cd build &&     make install &&     rm -rf /tmp/rocksdb      4
+ => CACHED [ 1/13] FROM docker.io/library/ubuntu:22.04@sha256:104ae83764a5119017b8e8d6218fa0832b09df65aae7d5a6de29a85d813da2fb                                                      0.0s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/writable_file_writer.cc.o                                                                                  
+ => [internal] load build context                                                                                                                                                   0.2s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/auto_roll_logger.cc.o                                                                                   
+ => => transferring context: 272.36kB                                                                                                                                               0.2s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/event_logger.cc.o                                                                                       
+ => [ 2/13] RUN sed -i 's@http://.*.ubuntu.com@http://mirrors.ustc.edu.cn@' /etc/apt/sources.list &&     apt-get update &&     apt-get install -y --no-install-recommends         148.3s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/log_buffer.cc.o                                                                                         
+ => [ 3/13] COPY googletest /tmp/googletest                                                                                                                                         0.1s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/arena.cc.o                                                                                               
+ => [ 4/13] RUN cd /tmp/googletest &&     cmake -B build -DCMAKE_INSTALL_PREFIX=/usr &&     cmake --build build &&     cd build &&     make install &&     rm -rf /tmp/googletest  64.1s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/concurrent_arena.cc.o                                                                                    
+ => [ 5/13] COPY scripts/install_dependencies.py /tmp/                                                                                                                            [+] Building 5141.8s (11/17)                                                                                                                                              docker:default6/13] RUN python3 /tmp/install_dependencies.py                                                                                                                              
+ => [internal] load .dockerignore                                                                                                                                                   0.0s7/13] COPY rocksdb /tmp/rocksdb                                                                                                                                             
+ => => transferring context: 2B                                                                                                                                                     0.0s8/13] RUN cd /tmp/rocksdb &&     cmake -B build -DCMAKE_INSTALL_PREFIX=/usr &&     cmake --build build &&     cd build &&     make install &&     rm -rf /tmp/rocksdb      4
+ => CACHED [ 1/13] FROM docker.io/library/ubuntu:22.04@sha256:104ae83764a5119017b8e8d6218fa0832b09df65aae7d5a6de29a85d813da2fb                                                      0.0s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/writable_file_writer.cc.o                                                                                  
+ => [internal] load build context                                                                                                                                                   0.2s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/auto_roll_logger.cc.o                                                                                   
+ => => transferring context: 272.36kB                                                                                                                                               0.2s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/event_logger.cc.o                                                                                       
+ => [ 2/13] RUN sed -i 's@http://.*.ubuntu.com@http://mirrors.ustc.edu.cn@' /etc/apt/sources.list &&     apt-get update &&     apt-get install -y --no-install-recommends         148.3s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/log_buffer.cc.o                                                                                         
+ => [ 3/13] COPY googletest /tmp/googletest                                                                                                                                         0.1s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/arena.cc.o                                                                                               
+ => [ 4/13] RUN cd /tmp/googletest &&     cmake -B build -DCMAKE_INSTALL_PREFIX=/usr &&     cmake --build build &&     cd build &&     make install &&     rm -rf /tmp/googletest  64.1s # [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/concurrent_arena.cc.o                                                                                    
+ => [ 5/13] COPY scripts/install_dependencies.py /tmp/                                                                                                                            [+] Building 5187.7s (12/17)                                                                                                                                       docker:default
+ => [internal] load build definition from Dockerfile                                                                                                                         0.0s 
+ => => transferring dockerfile: 2.65kB                                                                                                                                       0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:22.04                                                                                                              5.9s 
+ => [internal] load .dockerignore                                                                                                                                            0.0s
+ => => transferring context: 2B                                                                                                                                              0.0s4
+ => CACHED [ 1/13] FROM docker.io/library/ubuntu:22.04@sha256:104ae83764a5119017b8e8d6218fa0832b09df65aae7d5a6de29a85d813da2fb                                               0.0s
+ => [internal] load build context                                                                                                                                            0.2s 
+ => => transferring context: 272.36kB                                                                                                                                        0.2s
+ => [ 2/13] RUN sed -i 's@http://.*.ubuntu.com@http://mirrors.ustc.edu.cn@' /etc/apt/sources.list &&     apt-get update &&     apt-get install -y --no-install-recommends  148.3s 
+ => [ 3/13] COPY googletest /tmp/googletest                                                                                                                                  0.1s
+ => [ 4/13] RUN cd /tmp/googletest &&     cmake -B build -DCMAKE_INSTALL_PREFIX=/usr &&     cmake --build build &&     cd build &&     make install &&     rm -rf /tmp/goo  64.1s 
+ => [ 5/13] COPY scripts/install_dependencies.py /tmp/                                                                                                                       0.1s
+ => [ 6/13] RUN python3 /tmp/install_dependencies.py                                                                                                                        14.8s 
+ => [ 7/13] COPY rocksdb /tmp/rocksdb                                                                                                                                        0.2s
+ => ERROR [ 8/13] RUN cd /tmp/rocksdb &&     cmake -B build -DCMAKE_INSTALL_PREFIX=/usr &&     cmake --build build &&     cd build &&     make install &&     rm -rf /tm  4954.0s 
+------                                                                                                                                                                            
+ > [ 8/13] RUN cd /tmp/rocksdb &&     cmake -B build -DCMAKE_INSTALL_PREFIX=/usr &&     cmake --build build &&     cd build &&     make install &&     rm -rf /tmp/rocksdb:       
+1.142 -- The CXX compiler identification is GNU 11.4.0                                                                                                                            
+1.772 -- The C compiler identification is GNU 11.4.0
+1.887 -- The ASM compiler identification is GNU
+1.892 -- Found assembler: /usr/bin/cc
+1.918 -- Detecting CXX compiler ABI info
+3.019 -- Detecting CXX compiler ABI info - done
+3.075 -- Check for working CXX compiler: /usr/bin/c++ - skipped
+3.077 -- Detecting CXX compile features
+3.080 -- Detecting CXX compile features - done
+3.096 -- Detecting C compiler ABI info
+4.104 -- Detecting C compiler ABI info - done
+4.155 -- Check for working C compiler: /usr/bin/cc - skipped
+4.156 -- Detecting C compile features
+4.158 -- Detecting C compile features - done
+4.221 -- Found Git: /usr/bin/git (found version "2.34.1") 
+4.480 -- Performing Test HAS_ARMV8_CRC
+5.375 -- Performing Test HAS_ARMV8_CRC - Success
+5.375 --  HAS_ARMV8_CRC yes
+5.377 -- Performing Test HAVE_SSE42
+5.653 -- Performing Test HAVE_SSE42 - Failed
+5.654 -- Performing Test BUILTIN_ATOMIC
+7.051 -- Performing Test BUILTIN_ATOMIC - Success
+7.063 -- Could NOT find uring (missing: uring_LIBRARIES uring_INCLUDE_DIR) 
+7.063 -- Performing Test HAVE_THREAD_LOCAL
+8.015 -- Performing Test HAVE_THREAD_LOCAL - Success
+8.016 -- Enabling RTTI in Debug builds only (default)
+8.017 -- Performing Test HAVE_FALLOCATE
+9.049 -- Performing Test HAVE_FALLOCATE - Success
+9.049 -- Performing Test HAVE_SYNC_FILE_RANGE_WRITE
+10.08 -- Performing Test HAVE_SYNC_FILE_RANGE_WRITE - Success
+10.08 -- Performing Test HAVE_PTHREAD_MUTEX_ADAPTIVE_NP
+11.13 -- Performing Test HAVE_PTHREAD_MUTEX_ADAPTIVE_NP - Success
+11.13 -- Looking for malloc_usable_size
+12.25 -- Looking for malloc_usable_size - found
+12.25 -- Looking for sched_getcpu
+13.36 -- Looking for sched_getcpu - found
+13.36 -- Looking for getauxval
+13.79 -- Looking for getauxval - not found
+13.79 -- Looking for F_FULLFSYNC
+14.30 -- Looking for F_FULLFSYNC - not found
+14.30 -- Looking for pthread.h
+15.29 -- Looking for pthread.h - found
+15.29 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+16.36 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+16.36 -- Found Threads: TRUE  
+16.36 -- ROCKSDB_PLUGINS: 
+16.37 -- JNI library is disabled
+16.64 -- Configuring done
+18.33 -- Generating done
+18.38 -- Build files have been written to: /tmp/rocksdb/build
+19.37 [  0%] Building CXX object CMakeFiles/rocksdb.dir/cache/cache.cc.o
+27.99 [  0%] Building CXX object CMakeFiles/rocksdb.dir/cache/cache_entry_roles.cc.o
+31.66 [  0%] Building CXX object CMakeFiles/rocksdb.dir/cache/cache_key.cc.o
+34.60 [  0%] Building CXX object CMakeFiles/rocksdb.dir/cache/cache_reservation_manager.cc.o
+44.40 [  0%] Building CXX object CMakeFiles/rocksdb.dir/cache/clock_cache.cc.o
+47.03 [  1%] Building CXX object CMakeFiles/rocksdb.dir/cache/lru_cache.cc.o
+54.34 [  1%] Building CXX object CMakeFiles/rocksdb.dir/cache/sharded_cache.cc.o
+59.20 [  1%] Building CXX object CMakeFiles/rocksdb.dir/db/arena_wrapped_db_iter.cc.o
+77.73 [  1%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_fetcher.cc.o
+91.29 [  1%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_file_addition.cc.o
+96.38 [  1%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_file_builder.cc.o
+112.4 [  1%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_file_cache.cc.o
+120.0 [  1%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_file_garbage.cc.o
+124.9 [  1%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_file_meta.cc.o
+129.8 [  1%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_file_reader.cc.o
+139.3 [  1%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_garbage_meter.cc.o
+145.8 [  2%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_log_format.cc.o
+150.4 [  2%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_log_sequential_reader.cc.o
+157.9 [  2%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/blob_log_writer.cc.o
+167.1 [  2%] Building CXX object CMakeFiles/rocksdb.dir/db/blob/prefetch_buffer_collection.cc.o
+172.5 [  2%] Building CXX object CMakeFiles/rocksdb.dir/db/builder.cc.o
+190.6 [  2%] Building CXX object CMakeFiles/rocksdb.dir/db/c.cc.o
+207.0 [  2%] Building CXX object CMakeFiles/rocksdb.dir/db/column_family.cc.o
+233.6 [  2%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction/compaction.cc.o
+250.4 [  2%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction/compaction_iterator.cc.o
+267.2 [  2%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction/compaction_picker.cc.o
+284.1 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction/compaction_job.cc.o
+319.8 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction/compaction_picker_fifo.cc.o
+335.1 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction/compaction_picker_level.cc.o
+349.8 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction/compaction_picker_universal.cc.o
+366.1 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/compaction/sst_partitioner.cc.o
+375.6 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/convenience.cc.o
+393.3 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/db_filesnapshot.cc.o
+411.7 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl/compacted_db_impl.cc.o
+431.3 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl/db_impl.cc.o
+475.9 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl/db_impl_write.cc.o
+497.4 [  3%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl/db_impl_compaction_flush.cc.o
+531.0 [  4%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl/db_impl_files.cc.o
+555.7 [  4%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl/db_impl_open.cc.o
+587.5 [  4%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl/db_impl_debug.cc.o
+609.1 [  4%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl/db_impl_experimental.cc.o
+629.3 [  4%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl/db_impl_readonly.cc.o
+649.4 [  4%] Building CXX object CMakeFiles/rocksdb.dir/db/db_impl/db_impl_secondary.cc.o
+676.5 [  4%] Building CXX object CMakeFiles/rocksdb.dir/db/db_info_dumper.cc.o
+682.6 [  4%] Building CXX object CMakeFiles/rocksdb.dir/db/db_iter.cc.o
+702.2 [  4%] Building CXX object CMakeFiles/rocksdb.dir/db/dbformat.cc.o
+708.2 [  4%] Building CXX object CMakeFiles/rocksdb.dir/db/error_handler.cc.o
+726.7 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/event_helpers.cc.o
+740.5 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/experimental.cc.o
+756.6 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/external_sst_file_ingestion_job.cc.o
+778.0 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/file_indexer.cc.o
+787.2 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/flush_job.cc.o
+809.0 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/flush_scheduler.cc.o
+821.2 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/forward_iterator.cc.o
+842.1 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/import_column_family_job.cc.o
+858.7 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/internal_stats.cc.o
+881.8 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/logs_with_prep_tracker.cc.o
+885.0 [  5%] Building CXX object CMakeFiles/rocksdb.dir/db/log_reader.cc.o
+892.2 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/log_writer.cc.o
+901.0 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/malloc_stats.cc.o
+902.7 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/memtable.cc.o
+918.5 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/memtable_list.cc.o
+939.8 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/merge_helper.cc.o
+952.5 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/merge_operator.cc.o
+955.5 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/output_validator.cc.o
+960.5 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/periodic_work_scheduler.cc.o
+978.9 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/range_del_aggregator.cc.o
+992.9 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/range_tombstone_fragmenter.cc.o
+1004.9 [  6%] Building CXX object CMakeFiles/rocksdb.dir/db/repair.cc.o
+1028.8 [  7%] Building CXX object CMakeFiles/rocksdb.dir/db/snapshot_impl.cc.o
+1033.6 [  7%] Building CXX object CMakeFiles/rocksdb.dir/db/table_cache.cc.o
+1046.9 [  7%] Building CXX object CMakeFiles/rocksdb.dir/db/table_properties_collector.cc.o
+1052.7 [  7%] Building CXX object CMakeFiles/rocksdb.dir/db/transaction_log_impl.cc.o
+1068.0 [  7%] Building CXX object CMakeFiles/rocksdb.dir/db/trim_history_scheduler.cc.o
+1080.2 [  7%] Building CXX object CMakeFiles/rocksdb.dir/db/version_builder.cc.o
+1101.0 [  7%] Building CXX object CMakeFiles/rocksdb.dir/db/version_edit.cc.o
+1116.0 [  7%] Building CXX object CMakeFiles/rocksdb.dir/db/version_edit_handler.cc.o
+1139.7 [  7%] Building CXX object CMakeFiles/rocksdb.dir/db/version_set.cc.o
+1185.6 [  7%] Building CXX object CMakeFiles/rocksdb.dir/db/wal_edit.cc.o
+1191.2 [  8%] Building CXX object CMakeFiles/rocksdb.dir/db/wal_manager.cc.o
+1208.1 [  8%] Building CXX object CMakeFiles/rocksdb.dir/db/write_batch.cc.o
+1230.6 [  8%] Building CXX object CMakeFiles/rocksdb.dir/db/write_batch_base.cc.o
+1232.3 [  8%] Building CXX object CMakeFiles/rocksdb.dir/db/write_controller.cc.o
+1235.5 [  8%] Building CXX object CMakeFiles/rocksdb.dir/db/write_thread.cc.o
+1248.0 [  8%] Building CXX object CMakeFiles/rocksdb.dir/env/composite_env.cc.o
+1257.8 [  8%] Building CXX object CMakeFiles/rocksdb.dir/env/env.cc.o
+1276.0 [  8%] Building CXX object CMakeFiles/rocksdb.dir/env/env_chroot.cc.o
+1283.8 [  8%] Building CXX object CMakeFiles/rocksdb.dir/env/env_encryption.cc.o
+1298.5 [  8%] Building CXX object CMakeFiles/rocksdb.dir/env/env_hdfs.cc.o
+1301.9 [  8%] Building CXX object CMakeFiles/rocksdb.dir/env/file_system.cc.o
+1313.0 [  9%] Building CXX object CMakeFiles/rocksdb.dir/env/file_system_tracer.cc.o
+1320.8 [  9%] Building CXX object CMakeFiles/rocksdb.dir/env/fs_remap.cc.o
+1327.0 [  9%] Building CXX object CMakeFiles/rocksdb.dir/env/mock_env.cc.o
+1339.0 [  9%] Building CXX object CMakeFiles/rocksdb.dir/env/unique_id_gen.cc.o
+1343.9 [  9%] Building CXX object CMakeFiles/rocksdb.dir/file/delete_scheduler.cc.o
+1358.8 [  9%] Building CXX object CMakeFiles/rocksdb.dir/file/file_prefetch_buffer.cc.o
+1365.9 [  9%] Building CXX object CMakeFiles/rocksdb.dir/file/file_util.cc.o
+1381.0 [  9%] Building CXX object CMakeFiles/rocksdb.dir/file/filename.cc.o
+1390.5 [  9%] Building CXX object CMakeFiles/rocksdb.dir/file/line_file_reader.cc.o
+1397.8 [  9%] Building CXX object CMakeFiles/rocksdb.dir/file/random_access_file_reader.cc.o
+1406.6 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/file/read_write_util.cc.o
+1413.1 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/file/readahead_raf.cc.o
+1420.1 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/file/sequence_file_reader.cc.o
+1428.0 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/file/sst_file_manager_impl.cc.o
+1446.3 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/file/writable_file_writer.cc.o
+1457.0 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/logging/auto_roll_logger.cc.o
+1465.1 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/logging/event_logger.cc.o
+1469.9 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/logging/log_buffer.cc.o
+1474.6 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/memory/arena.cc.o
+1479.9 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/memory/concurrent_arena.cc.o
+1485.2 [ 10%] Building CXX object CMakeFiles/rocksdb.dir/memory/jemalloc_nodump_allocator.cc.o
+1492.7 [ 11%] Building CXX object CMakeFiles/rocksdb.dir/memory/memkind_kmem_allocator.cc.o
+1495.4 [ 11%] Building CXX object CMakeFiles/rocksdb.dir/memory/memory_allocator.cc.o
+1505.3 [ 11%] Building CXX object CMakeFiles/rocksdb.dir/memtable/alloc_tracker.cc.o
+1509.5 [ 11%] Building CXX object CMakeFiles/rocksdb.dir/memtable/hash_linklist_rep.cc.o
+1521.4 [ 11%] Building CXX object CMakeFiles/rocksdb.dir/memtable/hash_skiplist_rep.cc.o
+1532.7 [ 11%] Building CXX object CMakeFiles/rocksdb.dir/memtable/skiplistrep.cc.o
+1544.8 [ 11%] Building CXX object CMakeFiles/rocksdb.dir/memtable/vectorrep.cc.o
+1556.7 [ 11%] Building CXX object CMakeFiles/rocksdb.dir/memtable/write_buffer_manager.cc.o
+1573.6 [ 11%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/histogram.cc.o
+1578.7 [ 11%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/histogram_windowing.cc.o
+1581.9 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/in_memory_stats_history.cc.o
+1598.0 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/instrumented_mutex.cc.o
+1604.1 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/iostats_context.cc.o
+1609.3 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/perf_context.cc.o
+1615.4 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/perf_level.cc.o
+1619.4 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/persistent_stats_history.cc.o
+1636.0 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/statistics.cc.o
+1648.5 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/thread_status_impl.cc.o
+1652.3 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/thread_status_updater.cc.o
+1659.2 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/thread_status_util.cc.o
+1664.8 [ 12%] Building CXX object CMakeFiles/rocksdb.dir/monitoring/thread_status_util_debug.cc.o
+1670.1 [ 13%] Building CXX object CMakeFiles/rocksdb.dir/options/cf_options.cc.o
+1686.8 [ 13%] Building CXX object CMakeFiles/rocksdb.dir/options/configurable.cc.o
+1695.6 [ 13%] Building CXX object CMakeFiles/rocksdb.dir/options/customizable.cc.o
+1702.1 [ 13%] Building CXX object CMakeFiles/rocksdb.dir/options/db_options.cc.o
+1716.5 [ 13%] Building CXX object CMakeFiles/rocksdb.dir/options/options.cc.o
+1725.5 [ 13%] Building CXX object CMakeFiles/rocksdb.dir/options/options_helper.cc.o
+1743.4 [ 13%] Building CXX object CMakeFiles/rocksdb.dir/options/options_parser.cc.o
+1757.3 [ 13%] Building CXX object CMakeFiles/rocksdb.dir/port/stack_trace.cc.o
+1757.8 [ 13%] Building CXX object CMakeFiles/rocksdb.dir/table/adaptive/adaptive_table_factory.cc.o
+1767.0 [ 13%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/binary_search_index_reader.cc.o
+1775.9 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/block.cc.o
+1785.3 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/block_based_filter_block.cc.o
+1795.6 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/block_based_table_builder.cc.o
+1816.3 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/block_based_table_factory.cc.o
+1834.1 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/block_based_table_iterator.cc.o
+1843.9 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/block_based_table_reader.cc.o
+1869.6 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/block_builder.cc.o
+1875.0 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/block_prefetcher.cc.o
+1883.6 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/block_prefix_index.cc.o
+1888.4 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/data_block_hash_index.cc.o
+1893.0 [ 14%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/data_block_footer.cc.o
+1897.0 [ 15%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/filter_block_reader_common.cc.o
+1905.9 [ 15%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/filter_policy.cc.o
+1918.2 [ 15%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/flush_block_policy.cc.o
+1929.8 [ 15%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/full_filter_block.cc.o
+1939.4 [ 15%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/hash_index_reader.cc.o
+1949.0 [ 15%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/index_builder.cc.o
+1958.0 [ 15%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/index_reader_common.cc.o
+1966.5 [ 15%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/parsed_full_filter_block.cc.o
+1973.2 [ 15%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/partitioned_filter_block.cc.o
+1984.8 [ 15%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/partitioned_index_iterator.cc.o
+1994.2 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/partitioned_index_reader.cc.o
+2004.7 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/reader_common.cc.o
+2011.3 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/block_based/uncompression_dict_reader.cc.o
+2019.9 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/block_fetcher.cc.o
+2028.9 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/cuckoo/cuckoo_table_builder.cc.o
+2039.6 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/cuckoo/cuckoo_table_factory.cc.o
+2050.2 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/cuckoo/cuckoo_table_reader.cc.o
+2059.9 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/format.cc.o
+2069.1 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/get_context.cc.o
+2079.4 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/iterator.cc.o
+2086.3 [ 16%] Building CXX object CMakeFiles/rocksdb.dir/table/merging_iterator.cc.o
+2094.7 [ 17%] Building CXX object CMakeFiles/rocksdb.dir/table/meta_blocks.cc.o
+2104.8 [ 17%] Building CXX object CMakeFiles/rocksdb.dir/table/persistent_cache_helper.cc.o
+2113.1 [ 17%] Building CXX object CMakeFiles/rocksdb.dir/table/plain/plain_table_bloom.cc.o
+2118.6 [ 17%] Building CXX object CMakeFiles/rocksdb.dir/table/plain/plain_table_builder.cc.o
+2130.4 [ 17%] Building CXX object CMakeFiles/rocksdb.dir/table/plain/plain_table_factory.cc.o
+2143.9 [ 17%] Building CXX object CMakeFiles/rocksdb.dir/table/plain/plain_table_index.cc.o
+2150.2 [ 17%] Building CXX object CMakeFiles/rocksdb.dir/table/plain/plain_table_key_coding.cc.o
+2159.2 [ 17%] Building CXX object CMakeFiles/rocksdb.dir/table/plain/plain_table_reader.cc.o
+2171.1 [ 17%] Building CXX object CMakeFiles/rocksdb.dir/table/sst_file_dumper.cc.o
+2186.8 [ 17%] Building CXX object CMakeFiles/rocksdb.dir/table/sst_file_reader.cc.o
+2205.9 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/table/sst_file_writer.cc.o
+2225.2 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/table/table_factory.cc.o
+2233.1 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/table/table_properties.cc.o
+2239.1 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/table/two_level_iterator.cc.o
+2246.7 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/table/unique_id.cc.o
+2251.3 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/test_util/sync_point.cc.o
+2258.6 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/test_util/sync_point_impl.cc.o
+2266.5 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/test_util/testutil.cc.o
+2283.7 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/test_util/transaction_test_util.cc.o
+2291.4 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/tools/block_cache_analyzer/block_cache_trace_analyzer.cc.o
+2316.8 [ 18%] Building CXX object CMakeFiles/rocksdb.dir/tools/dump/db_dump_tool.cc.o
+2323.1 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/tools/io_tracer_parser_tool.cc.o
+2330.0 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/tools/ldb_cmd.cc.o
+2360.7 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/tools/ldb_tool.cc.o
+2367.8 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/tools/sst_dump_tool.cc.o
+2379.8 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/tools/trace_analyzer_tool.cc.o
+2408.7 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/trace_replay/block_cache_tracer.cc.o
+2425.9 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/trace_replay/io_tracer.cc.o
+2442.0 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/trace_replay/trace_record_handler.cc.o
+2448.5 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/trace_replay/trace_record_result.cc.o
+2451.0 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/trace_replay/trace_record.cc.o
+2457.0 [ 19%] Building CXX object CMakeFiles/rocksdb.dir/trace_replay/trace_replay.cc.o
+2474.8 [ 20%] Building CXX object CMakeFiles/rocksdb.dir/util/coding.cc.o
+2479.0 [ 20%] Building CXX object CMakeFiles/rocksdb.dir/util/compaction_job_stats_impl.cc.o
+2480.4 [ 20%] Building CXX object CMakeFiles/rocksdb.dir/util/comparator.cc.o
+2488.1 [ 20%] Building CXX object CMakeFiles/rocksdb.dir/util/compression_context_cache.cc.o
+2493.8 [ 20%] Building CXX object CMakeFiles/rocksdb.dir/util/concurrent_task_limiter_impl.cc.o
+2496.8 [ 20%] Building CXX object CMakeFiles/rocksdb.dir/util/crc32c.cc.o
+2503.0 [ 20%] Building CXX object CMakeFiles/rocksdb.dir/util/dynamic_bloom.cc.o
+2508.5 [ 20%] Building CXX object CMakeFiles/rocksdb.dir/util/hash.cc.o
+2515.1 [ 20%] Building CXX object CMakeFiles/rocksdb.dir/util/murmurhash.cc.o
+2516.6 [ 20%] Building CXX object CMakeFiles/rocksdb.dir/util/random.cc.o
+2521.5 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/util/rate_limiter.cc.o
+2533.7 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/util/ribbon_config.cc.o
+2535.9 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/util/regex.cc.o
+2549.4 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/util/slice.cc.o
+2562.4 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/util/file_checksum_helper.cc.o
+2591.6 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/util/status.cc.o
+2596.1 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/util/string_util.cc.o
+2602.3 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/util/thread_local.cc.o
+2608.6 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/util/threadpool_imp.cc.o
+2617.0 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/util/xxhash.cc.o
+2620.5 [ 21%] Building CXX object CMakeFiles/rocksdb.dir/utilities/backupable/backupable_db.cc.o
+2650.0 [ 22%] Building CXX object CMakeFiles/rocksdb.dir/utilities/blob_db/blob_compaction_filter.cc.o
+2669.3 [ 22%] Building CXX object CMakeFiles/rocksdb.dir/utilities/blob_db/blob_db.cc.o
+2691.2 [ 22%] Building CXX object CMakeFiles/rocksdb.dir/utilities/blob_db/blob_db_impl.cc.o
+2724.8 [ 22%] Building CXX object CMakeFiles/rocksdb.dir/utilities/blob_db/blob_db_impl_filesnapshot.cc.o
+2743.1 [ 22%] Building CXX object CMakeFiles/rocksdb.dir/utilities/blob_db/blob_dump_tool.cc.o
+2753.0 [ 22%] Building CXX object CMakeFiles/rocksdb.dir/utilities/blob_db/blob_file.cc.o
+2772.3 [ 22%] Building CXX object CMakeFiles/rocksdb.dir/utilities/cache_dump_load.cc.o
+2783.3 [ 22%] Building CXX object CMakeFiles/rocksdb.dir/utilities/cache_dump_load_impl.cc.o
+2796.6 [ 22%] Building CXX object CMakeFiles/rocksdb.dir/utilities/cassandra/cassandra_compaction_filter.cc.o
+2805.2 [ 22%] Building CXX object CMakeFiles/rocksdb.dir/utilities/cassandra/format.cc.o
+2810.5 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/cassandra/merge_operator.cc.o
+2817.5 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/checkpoint/checkpoint_impl.cc.o
+2833.3 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/compaction_filters.cc.o
+2841.5 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/compaction_filters/remove_emptyvalue_compactionfilter.cc.o
+2844.1 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/debug.cc.o
+2862.2 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/env_mirror.cc.o
+2867.6 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/env_timed.cc.o
+2875.1 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/fault_injection_env.cc.o
+2885.8 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/fault_injection_fs.cc.o
+2897.8 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/fault_injection_secondary_cache.cc.o
+2904.2 [ 23%] Building CXX object CMakeFiles/rocksdb.dir/utilities/leveldb_options/leveldb_options.cc.o
+2909.9 [ 24%] Building CXX object CMakeFiles/rocksdb.dir/utilities/memory/memory_util.cc.o
+2927.2 [ 24%] Building CXX object CMakeFiles/rocksdb.dir/utilities/merge_operators.cc.o
+2935.9 [ 24%] Building CXX object CMakeFiles/rocksdb.dir/utilities/merge_operators/bytesxor.cc.o
+2940.6 [ 24%] Building CXX object CMakeFiles/rocksdb.dir/utilities/merge_operators/max.cc.o
+2943.5 [ 24%] Building CXX object CMakeFiles/rocksdb.dir/utilities/merge_operators/put.cc.o
+2946.6 [ 24%] Building CXX object CMakeFiles/rocksdb.dir/utilities/merge_operators/sortlist.cc.o
+2949.9 [ 24%] Building CXX object CMakeFiles/rocksdb.dir/utilities/merge_operators/string_append/stringappend.cc.o
+2956.2 [ 24%] Building CXX object CMakeFiles/rocksdb.dir/utilities/merge_operators/string_append/stringappend2.cc.o
+2962.6 [ 24%] Building CXX object CMakeFiles/rocksdb.dir/utilities/merge_operators/uint64add.cc.o
+2967.3 [ 24%] Building CXX object CMakeFiles/rocksdb.dir/utilities/object_registry.cc.o
+2973.3 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/option_change_migration/option_change_migration.cc.o
+2979.3 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/options/options_util.cc.o
+2987.5 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/persistent_cache/block_cache_tier.cc.o
+2997.9 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/persistent_cache/block_cache_tier_file.cc.o
+3007.3 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/persistent_cache/block_cache_tier_metadata.cc.o
+3015.4 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/persistent_cache/persistent_cache_tier.cc.o
+3019.4 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/persistent_cache/volatile_tier_impl.cc.o
+3026.3 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/simulator_cache/cache_simulator.cc.o
+3034.8 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/simulator_cache/sim_cache.cc.o
+3044.2 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/table_properties_collectors/compact_on_deletion_collector.cc.o
+3053.2 [ 25%] Building CXX object CMakeFiles/rocksdb.dir/utilities/trace/file_trace_reader_writer.cc.o
+3062.1 [ 26%] Building CXX object CMakeFiles/rocksdb.dir/utilities/trace/replayer_impl.cc.o
+3068.4 [ 26%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/lock_manager.cc.o
+3075.6 [ 26%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/point/point_lock_tracker.cc.o
+3082.1 [ 26%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/point/point_lock_manager.cc.o
+3106.2 [ 26%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/range_tree_lock_manager.cc.o
+3127.9 [ 26%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/range_tree_lock_tracker.cc.o
+3136.5 [ 26%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/optimistic_transaction_db_impl.cc.o
+3155.7 [ 26%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/optimistic_transaction.cc.o
+3173.9 [ 26%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/pessimistic_transaction.cc.o
+3192.8 [ 26%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/pessimistic_transaction_db.cc.o
+3215.5 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/snapshot_checker.cc.o
+3232.6 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/transaction_base.cc.o
+3251.6 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/transaction_db_mutex_impl.cc.o
+3254.3 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/transaction_util.cc.o
+3271.1 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/write_prepared_txn.cc.o
+3290.7 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/write_prepared_txn_db.cc.o
+3315.2 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/write_unprepared_txn.cc.o
+3338.0 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/write_unprepared_txn_db.cc.o
+3359.8 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/ttl/db_ttl_impl.cc.o
+3384.4 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/wal_filter.cc.o
+3390.7 [ 27%] Building CXX object CMakeFiles/rocksdb.dir/utilities/write_batch_with_index/write_batch_with_index.cc.o
+3409.2 [ 28%] Building CXX object CMakeFiles/rocksdb.dir/utilities/write_batch_with_index/write_batch_with_index_internal.cc.o
+3427.1 [ 28%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/locktree/concurrent_tree.cc.o
+3428.5 [ 28%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/locktree/keyrange.cc.o
+3429.5 [ 28%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/locktree/lock_request.cc.o
+3436.1 [ 28%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/locktree/locktree.cc.o
+3442.6 [ 28%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/locktree/manager.cc.o
+3448.5 [ 28%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/locktree/range_buffer.cc.o
+3449.6 [ 28%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/locktree/treenode.cc.o
+3451.6 [ 28%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/locktree/txnid_set.cc.o
+3453.2 [ 28%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/locktree/wfg.cc.o
+3455.1 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/standalone_port.cc.o
+3456.1 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/util/dbt.cc.o
+3457.1 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/utilities/transactions/lock/range/range_tree/lib/util/memarena.cc.o
+3458.3 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/util/crc32c_arm64.cc.o
+3460.7 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/port/port_posix.cc.o
+3465.3 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/env/env_posix.cc.o
+3473.8 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/env/fs_posix.cc.o
+3485.4 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/env/io_posix.cc.o
+3493.8 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/third-party/folly/folly/detail/Futex.cpp.o
+3496.5 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/third-party/folly/folly/synchronization/AtomicNotification.cpp.o
+3498.6 [ 29%] Building CXX object CMakeFiles/rocksdb.dir/third-party/folly/folly/synchronization/DistributedMutex.cpp.o
+3501.6 [ 30%] Building CXX object CMakeFiles/rocksdb.dir/third-party/folly/folly/synchronization/ParkingLot.cpp.o
+3503.8 [ 30%] Building CXX object CMakeFiles/rocksdb.dir/third-party/folly/folly/synchronization/WaitOptions.cpp.o
+3504.6 [ 30%] Building CXX object CMakeFiles/rocksdb.dir/build_version.cc.o
+3507.8 [ 30%] Linking CXX static library librocksdb.a
+3515.3 [ 30%] Built target rocksdb
+3515.6 [ 30%] Building CXX object CMakeFiles/rocksdb-shared.dir/cache/cache.cc.o
+3523.4 [ 30%] Building CXX object CMakeFiles/rocksdb-shared.dir/cache/cache_entry_roles.cc.o
+3526.8 [ 30%] Building CXX object CMakeFiles/rocksdb-shared.dir/cache/cache_key.cc.o
+3529.5 [ 30%] Building CXX object CMakeFiles/rocksdb-shared.dir/cache/cache_reservation_manager.cc.o
+3538.9 [ 30%] Building CXX object CMakeFiles/rocksdb-shared.dir/cache/clock_cache.cc.o
+3541.3 [ 30%] Building CXX object CMakeFiles/rocksdb-shared.dir/cache/lru_cache.cc.o
+3548.1 [ 30%] Building CXX object CMakeFiles/rocksdb-shared.dir/cache/sharded_cache.cc.o
+3552.7 [ 31%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/arena_wrapped_db_iter.cc.o
+3570.1 [ 31%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_fetcher.cc.o
+3582.9 [ 31%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_file_addition.cc.o
+3587.7 [ 31%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_file_builder.cc.o
+3602.8 [ 31%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_file_cache.cc.o
+3609.9 [ 31%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_file_garbage.cc.o
+3614.6 [ 31%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_file_meta.cc.o
+3619.2 [ 31%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_file_reader.cc.o
+3628.1 [ 31%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_garbage_meter.cc.o
+3634.2 [ 31%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_log_format.cc.o
+3638.5 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_log_sequential_reader.cc.o
+3645.6 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/blob_log_writer.cc.o
+3654.3 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/blob/prefetch_buffer_collection.cc.o
+3659.3 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/builder.cc.o
+3676.6 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/c.cc.o
+3692.3 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/column_family.cc.o
+3717.6 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/compaction/compaction.cc.o
+3733.5 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/compaction/compaction_iterator.cc.o
+3749.4 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/compaction/compaction_picker.cc.o
+3765.6 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/compaction/compaction_job.cc.o
+3799.4 [ 32%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/compaction/compaction_picker_fifo.cc.o
+3813.3 [ 33%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/compaction/compaction_picker_level.cc.o
+3827.3 [ 33%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/compaction/compaction_picker_universal.cc.o
+3842.7 [ 33%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/compaction/sst_partitioner.cc.o
+3851.1 [ 33%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/convenience.cc.o
+3867.8 [ 33%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_filesnapshot.cc.o
+3885.3 [ 33%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_impl/compacted_db_impl.cc.o
+3903.8 [ 33%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_impl/db_impl.cc.o
+3946.4 [ 33%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_impl/db_impl_write.cc.o
+3967.0 [ 33%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_impl/db_impl_compaction_flush.cc.o
+4000.0 [ 33%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_impl/db_impl_files.cc.o
+4023.6 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_impl/db_impl_open.cc.o
+4052.0 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_impl/db_impl_debug.cc.o
+4072.8 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_impl/db_impl_experimental.cc.o
+4091.7 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_impl/db_impl_readonly.cc.o
+4110.3 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_impl/db_impl_secondary.cc.o
+4135.5 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_info_dumper.cc.o
+4141.4 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/db_iter.cc.o
+4160.9 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/dbformat.cc.o
+4166.6 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/error_handler.cc.o
+4184.4 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/event_helpers.cc.o
+4197.6 [ 34%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/experimental.cc.o
+4213.0 [ 35%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/external_sst_file_ingestion_job.cc.o
+4233.5 [ 35%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/file_indexer.cc.o
+4242.4 [ 35%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/flush_job.cc.o
+4263.5 [ 35%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/flush_scheduler.cc.o
+4275.2 [ 35%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/forward_iterator.cc.o
+4295.3 [ 35%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/import_column_family_job.cc.o
+4311.2 [ 35%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/internal_stats.cc.o
+4333.4 [ 35%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/logs_with_prep_tracker.cc.o
+4336.4 [ 35%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/log_reader.cc.o
+4343.4 [ 35%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/log_writer.cc.o
+4351.8 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/malloc_stats.cc.o
+4353.5 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/memtable.cc.o
+4368.6 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/memtable_list.cc.o
+4389.0 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/merge_helper.cc.o
+4401.1 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/merge_operator.cc.o
+4404.0 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/output_validator.cc.o
+4408.8 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/periodic_work_scheduler.cc.o
+4426.4 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/range_del_aggregator.cc.o
+4439.8 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/range_tombstone_fragmenter.cc.o
+4451.3 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/repair.cc.o
+4474.1 [ 36%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/snapshot_impl.cc.o
+4478.7 [ 37%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/table_cache.cc.o
+4491.5 [ 37%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/table_properties_collector.cc.o
+4497.1 [ 37%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/transaction_log_impl.cc.o
+4511.8 [ 37%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/trim_history_scheduler.cc.o
+4523.4 [ 37%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/version_builder.cc.o
+4543.4 [ 37%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/version_edit.cc.o
+4557.8 [ 37%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/version_edit_handler.cc.o
+4580.5 [ 37%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/version_set.cc.o
+4624.3 [ 37%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/wal_edit.cc.o
+4629.7 [ 37%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/wal_manager.cc.o
+4645.3 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/write_batch.cc.o
+4666.9 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/write_batch_base.cc.o
+4668.6 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/write_controller.cc.o
+4671.6 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/db/write_thread.cc.o
+4683.6 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/env/composite_env.cc.o
+4693.0 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/env/env.cc.o
+4710.4 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/env/env_chroot.cc.o
+4717.9 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/env/env_encryption.cc.o
+4732.1 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/env/env_hdfs.cc.o
+4735.4 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/env/file_system.cc.o
+4746.1 [ 38%] Building CXX object CMakeFiles/rocksdb-shared.dir/env/file_system_tracer.cc.o
+4753.9 [ 39%] Building CXX object CMakeFiles/rocksdb-shared.dir/env/fs_remap.cc.o
+4759.9 [ 39%] Building CXX object CMakeFiles/rocksdb-shared.dir/env/mock_env.cc.o
+4771.2 [ 39%] Building CXX object CMakeFiles/rocksdb-shared.dir/env/unique_id_gen.cc.o
+4775.7 [ 39%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/delete_scheduler.cc.o
+4789.8 [ 39%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/file_prefetch_buffer.cc.o
+4796.3 [ 39%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/file_util.cc.o
+4810.3 [ 39%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/filename.cc.o
+4819.2 [ 39%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/line_file_reader.cc.o
+4825.9 [ 39%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/random_access_file_reader.cc.o
+4834.1 [ 39%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/read_write_util.cc.o
+4840.2 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/readahead_raf.cc.o
+4846.7 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/sequence_file_reader.cc.o
+4854.1 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/sst_file_manager_impl.cc.o
+4871.2 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/file/writable_file_writer.cc.o
+4881.2 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/auto_roll_logger.cc.o
+4888.7 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/event_logger.cc.o
+4893.1 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/logging/log_buffer.cc.o
+4897.6 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/arena.cc.o
+4902.7 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/concurrent_arena.cc.o
+4908.4 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/jemalloc_nodump_allocator.cc.o
+4915.5 [ 40%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/memkind_kmem_allocator.cc.o
+4918.1 [ 41%] Building CXX object CMakeFiles/rocksdb-shared.dir/memory/memory_allocator.cc.o
+4927.6 [ 41%] Building CXX object CMakeFiles/rocksdb-shared.dir/memtable/alloc_tracker.cc.o
+4931.7 [ 41%] Building CXX object CMakeFiles/rocksdb-shared.dir/memtable/hash_linklist_rep.cc.o
+4943.1 [ 41%] Building CXX object CMakeFiles/rocksdb-shared.dir/memtable/hash_skiplist_rep.cc.o
+4953.9 [ 41%] Building CXX object CMakeFiles/rocksdb-shared.dir/memtable/skiplistrep.cc.o
+4954.0 c++: internal compiler error: Segmentation fault signal terminated program cc1plus
+4954.0 Please submit a full bug report,
+4954.0 with preprocessed source if appropriate.
+4954.0 See <file:///usr/share/doc/gcc-11/README.Bugs> for instructions.
+4954.0 gmake[2]: *** [CMakeFiles/rocksdb-shared.dir/build.make:1700: CMakeFiles/rocksdb-shared.dir/memtable/skiplistrep.cc.o] Error 4
+4954.0 gmake[1]: *** [CMakeFiles/Makefile2:566: CMakeFiles/rocksdb-shared.dir/all] Error 2
+4954.0 gmake: *** [Makefile:146: all] Error 2
+------
+Dockerfile:38
+--------------------
+  37 |     COPY rocksdb /tmp/rocksdb
+  38 | >>> RUN cd /tmp/rocksdb && \
+  39 | >>>     cmake -B build -DCMAKE_INSTALL_PREFIX=/usr && \
+  40 | >>>     cmake --build build && \
+  41 | >>>     cd build && \
+  42 | >>>     make install && \
+  43 | >>>     rm -rf /tmp/rocksdb
+  44 |     # 再手动安装 isa-l 源码，复制到容器
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c cd /tmp/rocksdb &&     cmake -B build -DCMAKE_INSTALL_PREFIX=/usr &&     cmake --build build &&     cd build &&     make install &&     rm -rf /tmp/rocksdb" did not complete successfully: exit code: 2
+wenry@wenry-ThinkPad:~/programs/FlexRaft-Code$ 

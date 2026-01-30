@@ -1,0 +1,99 @@
+构建镜像，安装依赖
+sudo docker build --no-cache -t flexraft:arm64 .
+sudo docker build --no-cache -t flexraft:icpp23 .
+
+指定构建ARM64镜像，指定平台
+sudo docker build --platform linux/arm64 --no-cache -t flexraft:arm64 .
+# sudo docker buildx build --platform linux/arm64 --no-cache -t flexraft:arm64 .
+
+挂载代码目录(只需挂载一次)：宿主机和容器之间可以同步，修改代码以及数据可以同步
+sudo docker run -it --name flexraft-test \
+    -v ~/programs/FlexRaft-Code:/flexraft \
+    flexraft:icpp23 bash
+
+查看镜像的架构：
+
+sudo docker inspect flexraft:arm64 | grep -i architecture 
+创建交叉编译的容器：
+sudo docker run -it --network host \
+    --name flexraft-rk3588-0 \
+    flexraft:arm64 bash
+
+sudo docker run -it --network host \
+    --name flexraft-k-1 \
+    flexraft:arm64-k-1 bash
+启动并进入容器：
+sudo docker start flexraft-test && sudo docker exec -it flexraft-test bash
+全量日志复制性能测试：
+sudo docker start flexraft-k-1 && sudo docker exec -it flexraft-k-1 bash          
+flexraft-k-1
+
+进入rk3588的容器：
+sudo docker start flexraft-rk3588 && sudo docker exec -it flexraft-rk3588 bash
+sudo docker start flexraft-k-1 && sudo docker exec -it flexraft-rk3588 bash
+sudo docker start flexraft-test0 && sudo docker exec -it flexraft-test0 bash
+列出构建的所有镜像
+sudo docker images
+
+列出某个镜像的所有容器
+sudo docker ps -a --filter ancestor=flexraft:arm64
+
+删除镜像：sudo docker rmi IMAGE_ID
+删除容器：sudo docker rm CONTAINER_ID
+
+从笔记本上导出docker镜像文件：
+docker save -o flexraft_arm64.tar flexraft:arm64
+复制到开发板上：
+scp flexraft_arm64.tar orangepi@172.30.14.97:/home/yourname/
+加载镜像：
+docker load -i flexraft_arm64.tar
+
+配置文件的复制：docker cp /home/orangepi/gwy/raft_cluster-3.conf flexraft-test0:/app/raft_cluster-3.conf
+
+编译代码
+    清除之前的编译缓存：make clean
+    重新编译：CMAKE=cmake make build
+
+跑某个配置(放在根目录下)的命令：
+cd build && ./bench/bench_server --conf=../example.conf --id=0
+cd build && ./bench/bench_server --conf=../example.conf --id=1
+cd build && ./bench/bench_server --conf=../example.conf --id=2
+
+启动客户端
+cd build，写入1000条2M数据
+./bench/bench_client --conf=../example.conf --id=0 --size=2M --write_num=1000
+
+./bench/bench_client --conf=../example.conf --id=0 --size=4K --write_num=500
+./bench/bench_client --conf=../example.conf --id=0 --size=16K --write_num=500
+./bench/bench_client --conf=../example.conf --id=0 --size=64K --write_num=500
+./bench/bench_client --conf=../example.conf --id=0 --size=128K --write_num=500
+./bench/bench_client --conf=../example.conf --id=0 --size=256K --write_num=500
+./bench/bench_client --conf=../example.conf --id=0 --size=512K --write_num=500
+./bench/bench_client --conf=../example.conf --id=0 --size=1024K --write_num=500
+./bench/bench_client --conf=../example.conf --id=0 --size=2048K --write_num=500
+
+清理上一次启动留下的数据(由于日志和数据都存储到了/tmp文件夹下，因此清空/tmp下的所有文件，但是不要删除tmp文件夹)：
+sudo find /tmp -mindepth 1 -print # 确认删除列表
+sudo find /tmp -mindepth 1 -delete # 执行删除操作
+
+跑bench：
+./bench/bench_server --conf=./raft_cluster-3.conf --id=0
+./bench/bench_server --conf=./raft_cluster-3.conf --id=1
+./bench/bench_server --conf=./raft_cluster-3.conf --id=2
+./bench/bench_server --conf=./raft_cluster-3.conf --id=3
+
+# 要挂载raft_log和testdb，不然全部存在容器里，写大文件时内存不够
+docker run -it --rm \
+  --network host \
+  -v /home/orangepi/gwy/raft_cluster-3.conf:/app/raft_cluster-3.conf \
+  -v /home/orangepi/gwy/data/raft_log0:/tmp/raft_log0 \
+  -v /home/orangepi/gwy/data/testdb0:/tmp/testdb0 \
+  flexraft:arm64 \
+  bash
+
+# 在单个节点处
+docker run -it --rm   --network host   -v /home/orangepi/gwy/raft_cluster-7.conf:/app/raft_cluster-7.conf   flexraft:arm64   bash
+root@orangepi5plus:/app# ./bench/bench_client --conf=./raft_cluster-7.conf --id=0 --size=4K --write_num=500
+
+
+

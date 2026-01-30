@@ -996,6 +996,12 @@ void RaftState::ReplicateNewProposeEntry(raft_index_t raft_index) {
   // parameters as encoding parameter
   auto live_servers = live_monitor_.LiveNumber();
 
+  // 令k=1来模拟全复制模式
+#ifdef FULL_REPLICATION_MODE
+  raft_encoding_param_t encode_k = 1;
+  raft_encoding_param_t encode_m = GetClusterServerNumber() - 1;
+  LOG(util::kRaft, "S%d [FULL-MODE] K:1 M:%d", id_, encode_m);
+#else
   // k = N'- F, m = N - k where N is fixed
   // Makes sure there are totally N chunks and each of these chunks is mapped to
   // a certain follower
@@ -1004,7 +1010,9 @@ void RaftState::ReplicateNewProposeEntry(raft_index_t raft_index) {
 
   LOG(util::kRaft, "S%d Estimates %d Alive Servers K:%d M:%d", id_, live_servers, encode_k,
       encode_m);
-
+  
+#endif
+  
   // Encode the entry
   auto stripe = new Stripe();
 #ifdef ENABLE_PERF_RECORDING

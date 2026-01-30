@@ -1,0 +1,31 @@
+orange pi 5 plus: 排序是风扇在上
+the same:USER-orangepi PASSWORD-orangepi
+NO.1:IP-172.30.14.188
+NO.2:IP-172.30.14.42
+NO.3:IP-172.30.15.179
+NO.4:IP-172.30.15.117
+NO.5:IP-172.30.15.211
+NO.6:IP-172.30.15.19
+另一列：rk12192
+NO.7:IP-172.30.14.101
+NO.8:IP-
+NO.9:IP-
+orange pi 5:
+203:IP-172.30.15.87 USER-orangepi
+204：IP-172.30.14.97 USER-orangepi
+205：IP-172.30.14.149 USER-orangepi
+206：IP-172.30.15.110 USER-orangepi
+
+故障节点：201、202和206
+
+节点系统版本是Orange Pi OS（Droid），官方首选稳定版本。各个版本如下：
+205：orange pi 1.0.10 focal with linux 6.1.43
+204：orange pi 1.0.10 focal with linux 6.1.43-rockchip-rk3588
+203：orange pi 1.0.10 focal with linux 6.1.43-rockchip-rk3588
+202:红灯常亮；201和205都是紫色的灯；
+
+连接wifi：nmcli dev wifi connect JLJLAB_WiFi password ''
+连接Rk3588设备：ssh orangepi@ip PASSWORD-qwe
+传输镜像文件给Rk3588：sudo scp flexraft_arm64_image.tar orangepi@172.30.15.87:/home/orangepi/gwy/
+确保安装好了docker：docker --version
+在rk3588上加载镜像：docker load -i flexraft_arm64_image.tar
