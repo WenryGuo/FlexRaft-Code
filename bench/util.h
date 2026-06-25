@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <mutex>
 #include <random>
 #include <string>
@@ -14,17 +15,61 @@
 
 inline auto ParseNetAddress(const std::string &net_addr) -> raft::rpc::NetAddress {
   auto specifier = net_addr.find(":");
+  if (specifier == std::string::npos) {
+    std::cerr << "[ERROR] ParseNetAddress: invalid address '" << net_addr << "' (missing ':')\n";
+    return raft::rpc::NetAddress{net_addr, 0};
+  }
   auto port_str = net_addr.substr(specifier + 1, net_addr.size() - specifier - 1);
-  return raft::rpc::NetAddress{net_addr.substr(0, specifier),
-                               static_cast<uint16_t>(std::stoi(port_str, nullptr))};
+  int port = 0;
+  try {
+    port = std::stoi(port_str, nullptr);
+  } catch (const std::exception &e) {
+    std::cerr << "[ERROR] ParseNetAddress: stoi failed on port '" << port_str
+              << "' from '" << net_addr << "': " << e.what() << "\n";
+    return raft::rpc::NetAddress{net_addr.substr(0, specifier), 0};
+  }
+  return raft::rpc::NetAddress{net_addr.substr(0, specifier), static_cast<uint16_t>(port)};
 }
 
 inline auto ParseCommandSize(const std::string &size_str) -> int {
-  if (std::isdigit(size_str.back())) {
-    return std::stoi(size_str);
+  if (size_str.empty()) {
+    return 0;
   }
-  auto num = std::stoi(size_str.substr(0, size_str.size() - 1));
-  switch (size_str.back()) {
+  if (std::isdigit(size_str.back())) {
+    try {
+      return std::stoi(size_str);
+    } catch (const std::exception &) {
+      return 0;
+    }
+  }
+
+  std::string num_part = size_str.substr(0, size_str.size() - 1);
+  if (num_part.empty()) {
+    return 0;
+  }
+  int num = 0;
+  try {
+    num = std::stoi(num_part);
+  } catch (const std::exception &) {
+    return 0;
+  }
+
+  char suffix1 = size_str.back();
+  if ((suffix1 == 'K' || suffix1 == 'k') && size_str.size() >= 2 &&
+      (size_str[size_str.size() - 2] == 'B' || size_str[size_str.size() - 2] == 'b')) {
+    return num * 1024;
+  }
+  if ((suffix1 == 'M' || suffix1 == 'm') && size_str.size() >= 2 &&
+      (size_str[size_str.size() - 2] == 'B' || size_str[size_str.size() - 2] == 'b')) {
+    return num * 1024 * 1024;
+  }
+  if (suffix1 == 'G' || suffix1 == 'g') {
+    if (size_str.size() >= 2 && (size_str[size_str.size() - 2] == 'B' || size_str[size_str.size() - 2] == 'b')) {
+      return num * 1024 * 1024 * 1024;
+    }
+  }
+
+  switch (suffix1) {
     case 'K':
     case 'k':
       return num * 1024;
@@ -32,6 +77,7 @@ inline auto ParseCommandSize(const std::string &size_str) -> int {
     case 'm':
       return num * 1024 * 1024;
     case 'G':
+    case 'g':
       return num * 1024 * 1024 * 1024;
     default:
       return 0;
@@ -40,18 +86,36 @@ inline auto ParseCommandSize(const std::string &size_str) -> int {
 
 // This is an interface for parsing cluster configurations of config file
 inline auto ParseConfigurationFile(const std::string &filename) -> kv::KvClusterConfig {
-  std::ifstream cfg(filename);
+  std::ifstream fin(filename);
   kv::KvClusterConfig cluster_cfg;
 
-  std::string node_id;
-  std::string raft_rpc_addr;
-  std::string kv_rpc_addr;
-  std::string logname;
-  std::string dbname;
+  std::string line;
+  bool first_line_done = false;
 
-  while (cfg >> node_id >> raft_rpc_addr >> kv_rpc_addr >> logname >> dbname) {
+  while (std::getline(fin, line)) {
+    if (line.empty() || line[0] == '#') continue;
+    std::istringstream ss(line);
+    std::string node_id_str;
+    std::string raft_rpc_addr;
+    std::string kv_rpc_addr;
+    std::string logname;
+    std::string dbname;
+
+    if (!first_line_done) {
+      ss >> node_id_str;  // first line is cluster size N, skip
+      first_line_done = true;
+      continue;
+    }
+
+    ss >> node_id_str >> raft_rpc_addr >> kv_rpc_addr >> logname >> dbname;
     kv::KvServiceNodeConfig cfg;
-    cfg.id = std::stoi(node_id);
+    try {
+      cfg.id = std::stoi(node_id_str);
+    } catch (const std::exception &e) {
+      std::cerr << "[ERROR] ParseConfigurationFile: stoi failed on node_id '" << node_id_str
+                << "': " << e.what() << "\n";
+      continue;
+    }
     cfg.raft_rpc_addr = ParseNetAddress(raft_rpc_addr);
     auto addr = ParseNetAddress(kv_rpc_addr);
     cfg.kv_rpc_addr = kv::rpc::NetAddress{addr.ip, addr.port};

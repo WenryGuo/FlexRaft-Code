@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+
+#include "rocksdb/write_batch.h"
 namespace kv {
 class StorageEngine {
  public:
@@ -33,5 +35,8 @@ class StorageEngine {
   // Delete the record with specific key, return true if the key is successfully
   // deleted, otherwise return false
   virtual bool Delete(const std::string &key) = 0;
+
+  // Write a batch of key-value pairs atomically. Returns true on success.
+  virtual bool Write(rocksdb::WriteBatch *batch) = 0;
 };
 }  // namespace kv

@@ -164,7 +164,7 @@ void ExecuteBench(kv::KvServiceClient *client, int client_id, int interval,
         total_size += (op.key.size() + op.value.size());
 
         auto start = raft::util::NowTime();
-        auto stat = client->Put(op.key, op.value);
+        auto stat = client->RoutePut(op.key, op.value);
         auto dura = raft::util::DurationToMicros(start, raft::util::NowTime());
         if (stat.err == kv::kOk) {
           op_stats.push_back(OperationStat{kPut, static_cast<uint64_t>(dura),
@@ -178,7 +178,7 @@ void ExecuteBench(kv::KvServiceClient *client, int client_id, int interval,
       case kGet: {
         std::string get_val;
         auto start = raft::util::NowTime();
-        auto stat = client->Get(op.key, &get_val);
+        auto stat = client->RouteGet(op.key, &get_val);
         auto dura = raft::util::DurationToMicros(start, raft::util::NowTime());
 
         if (stat.err == kv::kOk) {
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
   // Do warmup
   auto client = new kv::KvServiceClient(cluster_cfg, 0);
   for (int i = 0; i < 1000; ++i) {
-    auto stat = client->Put(raft::util::MakeKey(i, 64), raft::util::MakeValue(i, val_size));
+    auto stat = client->RoutePut(raft::util::MakeKey(i, 64), raft::util::MakeValue(i, val_size));
     assert(stat.err == kv::kOk);
   }
   delete client;
@@ -255,7 +255,7 @@ int main(int argc, char *argv[]) {
 
   for (int i = 1; i <= client_num; ++i) {
     const auto client_id = i;
-    auto client = new kv::KvServiceClient(cluster_cfg, client_id);
+    auto client = new kv::KvServiceClient(cluster_cfg, client_id, client_num);
     threads[client_id] = std::thread(
         [&]() { ExecuteBench(client, client_id, client_num, stats[client_id], bench); });
   }

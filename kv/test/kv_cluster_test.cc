@@ -85,7 +85,7 @@ class KvClusterTest : public ::testing::Test {
     for (int i = key_lo; i <= key_hi; ++i) {
       auto key = key_prefix + std::to_string(i);
       auto value = value_prefix + std::to_string(i);
-      EXPECT_EQ(client->Put(key, value).err, kOk);
+      EXPECT_EQ(client->RoutePut(key, value).err, kOk);
     }
   }
 
@@ -95,7 +95,7 @@ class KvClusterTest : public ::testing::Test {
     for (int i = key_lo; i <= key_hi; ++i) {
       auto key = key_prefix + std::to_string(i);
       auto expect_value = expect_val_prefix + std::to_string(i);
-      EXPECT_EQ(client->Get(key, &get_val).err, kOk);
+      EXPECT_EQ(client->RouteGet(key, &get_val).err, kOk);
       ASSERT_EQ(get_val, expect_value);
     }
   }
@@ -108,9 +108,9 @@ class KvClusterTest : public ::testing::Test {
 
 TEST_F(KvClusterTest, DISABLED_TestSimplePutGetOperation) {
   auto cluster_config = KvClusterConfig{
-      {0, {0, {"127.0.0.1", 50000}, {"127.0.0.1", 50003}, "", "./testdb0"}},
-      {1, {1, {"127.0.0.1", 50001}, {"127.0.0.1", 50004}, "", "./testdb1"}},
-      {2, {2, {"127.0.0.1", 50002}, {"127.0.0.1", 50005}, "", "./testdb2"}},
+      {0, {0, 0, {"127.0.0.1", 50000}, {"127.0.0.1", 50003}, "", "./testdb0"}},
+      {1, {1, 0, {"127.0.0.1", 50001}, {"127.0.0.1", 50004}, "", "./testdb1"}},
+      {2, {2, 0, {"127.0.0.1", 50002}, {"127.0.0.1", 50005}, "", "./testdb2"}},
   };
   LaunchKvServiceNodes(cluster_config);
   sleepMs(1000);
@@ -124,11 +124,11 @@ TEST_F(KvClusterTest, DISABLED_TestSimplePutGetOperation) {
 
 TEST_F(KvClusterTest, TestGetAfterOldLeaderFail) {
   auto cluster_config = KvClusterConfig{
-      {0, {0, {"127.0.0.1", 50000}, {"127.0.0.1", 50005}, "", "./testdb0"}},
-      {1, {1, {"127.0.0.1", 50001}, {"127.0.0.1", 50006}, "", "./testdb1"}},
-      {2, {2, {"127.0.0.1", 50002}, {"127.0.0.1", 50007}, "", "./testdb2"}},
-      {3, {3, {"127.0.0.1", 50003}, {"127.0.0.1", 50008}, "", "./testdb3"}},
-      {4, {4, {"127.0.0.1", 50004}, {"127.0.0.1", 50009}, "", "./testdb4"}},
+      {0, {0, 0, {"127.0.0.1", 50000}, {"127.0.0.1", 50005}, "", "./testdb0"}},
+      {1, {1, 0, {"127.0.0.1", 50001}, {"127.0.0.1", 50006}, "", "./testdb1"}},
+      {2, {2, 0, {"127.0.0.1", 50002}, {"127.0.0.1", 50007}, "", "./testdb2"}},
+      {3, {3, 0, {"127.0.0.1", 50003}, {"127.0.0.1", 50008}, "", "./testdb3"}},
+      {4, {4, 0, {"127.0.0.1", 50004}, {"127.0.0.1", 50009}, "", "./testdb4"}},
   };
   LaunchKvServiceNodes(cluster_config);
   sleepMs(1000);
@@ -148,11 +148,11 @@ TEST_F(KvClusterTest, TestGetAfterOldLeaderFail) {
 
 TEST_F(KvClusterTest, DISABLED_TestGetAfterOldLeaderFailRepeatedly) {
   auto cluster_config = KvClusterConfig{
-      {0, {0, {"127.0.0.1", 50000}, {"127.0.0.1", 50005}, "", "./testdb0"}},
-      {1, {1, {"127.0.0.1", 50001}, {"127.0.0.1", 50006}, "", "./testdb1"}},
-      {2, {2, {"127.0.0.1", 50002}, {"127.0.0.1", 50007}, "", "./testdb2"}},
-      {3, {3, {"127.0.0.1", 50003}, {"127.0.0.1", 50008}, "", "./testdb3"}},
-      {4, {4, {"127.0.0.1", 50004}, {"127.0.0.1", 50009}, "", "./testdb4"}},
+      {0, {0, 0, {"127.0.0.1", 50000}, {"127.0.0.1", 50005}, "", "./testdb0"}},
+      {1, {1, 0, {"127.0.0.1", 50001}, {"127.0.0.1", 50006}, "", "./testdb1"}},
+      {2, {2, 0, {"127.0.0.1", 50002}, {"127.0.0.1", 50007}, "", "./testdb2"}},
+      {3, {3, 0, {"127.0.0.1", 50003}, {"127.0.0.1", 50008}, "", "./testdb3"}},
+      {4, {4, 0, {"127.0.0.1", 50004}, {"127.0.0.1", 50009}, "", "./testdb4"}},
   };
   LaunchKvServiceNodes(cluster_config);
   sleepMs(1000);
@@ -176,11 +176,11 @@ TEST_F(KvClusterTest, DISABLED_TestGetAfterOldLeaderFailRepeatedly) {
 
 TEST_F(KvClusterTest, DISABLED_TestFollowerRejoiningAfterLeaderCommitingSomeNewEntries) {
   auto cluster_config = KvClusterConfig{
-      {0, {0, {"127.0.0.1", 50000}, {"127.0.0.1", 50005}, "", "./testdb0"}},
-      {1, {1, {"127.0.0.1", 50001}, {"127.0.0.1", 50006}, "", "./testdb1"}},
-      {2, {2, {"127.0.0.1", 50002}, {"127.0.0.1", 50007}, "", "./testdb2"}},
-      {3, {3, {"127.0.0.1", 50003}, {"127.0.0.1", 50008}, "", "./testdb3"}},
-      {4, {4, {"127.0.0.1", 50004}, {"127.0.0.1", 50009}, "", "./testdb4"}},
+      {0, {0, 0, {"127.0.0.1", 50000}, {"127.0.0.1", 50005}, "", "./testdb0"}},
+      {1, {1, 0, {"127.0.0.1", 50001}, {"127.0.0.1", 50006}, "", "./testdb1"}},
+      {2, {2, 0, {"127.0.0.1", 50002}, {"127.0.0.1", 50007}, "", "./testdb2"}},
+      {3, {3, 0, {"127.0.0.1", 50003}, {"127.0.0.1", 50008}, "", "./testdb3"}},
+      {4, {4, 0, {"127.0.0.1", 50004}, {"127.0.0.1", 50009}, "", "./testdb4"}},
   };
   LaunchKvServiceNodes(cluster_config);
   sleepMs(1000);

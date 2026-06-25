@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include "log_entry.h"
 
 namespace raft {
@@ -11,6 +12,12 @@ enum Status {
   kMemAllocateFail = 1,
   kIndexBeyondRange = 2,
   kNeedSnapshot = 3,
+};
+
+// Result of atomic append operation - returns the allocated index
+struct AppendResult {
+  raft_index_t index;
+  Status status;
 };
 
 class Storage;
@@ -26,6 +33,12 @@ class LogManager {
   // Callback function when an entry is deleted in log manager
   using Deleter = void (*)(LogEntry *);
   friend void ReadLogFromPersister(LogManager *lm, Storage *persister);
+
+  // LRC cache cleanup callback (called when log entries are discarded)
+  using LrcCacheCleanupCallback = std::function<void(raft_index_t)>;
+  void SetLrcCacheCleanupCallback(LrcCacheCleanupCallback cb) {
+    lrc_cache_cleanup_cb_ = std::move(cb);
+  }
 
  public:
   // Default constructor is not allowed, one LogManager needs at least one
@@ -63,6 +76,11 @@ class LogManager {
  public:
   /// Public interface
   Status AppendLogEntry(const LogEntry &entry);
+
+  // Atomic: allocate index and append entry in one lock acquisition.
+  // Returns the allocated index in result.index, or 0 if not leader.
+  // This prevents race conditions in multi-threaded Propose().
+  AppendResult AppendLogEntryAtomic(const LogEntry &entry);
 
   // Replace the entry at specified raft index using input entry
   // TODO: Proof of log matching property in flexibleK
@@ -131,6 +149,9 @@ class LogManager {
   LogEntry *entries_;
 
   Deleter deleter_;
+
+  // LRC cache cleanup callback
+  LrcCacheCleanupCallback lrc_cache_cleanup_cb_;
 };
 
 // NOTE: This function does not check if idx is valid. The caller

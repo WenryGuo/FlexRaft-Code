@@ -95,7 +95,7 @@ void ExecuteBench(kv::KvServiceClient *client, const std::vector<KvPair> &bench)
 
   // Ingest data to do warm up first:
   for (const auto &p : bench) {
-    auto stat = client->Put(p.first, p.second);
+    auto stat = client->RoutePut(p.first, p.second);
     if (stat.err != kv::kOk) {
       printf("Warmup failed");
       exit(1);
@@ -106,9 +106,8 @@ void ExecuteBench(kv::KvServiceClient *client, const std::vector<KvPair> &bench)
 
   std::this_thread::sleep_for(std::chrono::seconds(3));
 
-  // Abort the leader
-  auto stat = client->Abort();
-
+  // Abort the leader (not supported in Multi-Raft mode)
+  // auto stat = client->Abort();
   // Wait for the cluster to achieve new consensus
   std::this_thread::sleep_for(std::chrono::seconds(3));
 
@@ -119,7 +118,7 @@ void ExecuteBench(kv::KvServiceClient *client, const std::vector<KvPair> &bench)
     for (int i = 0; i < repeated_read_cnt; ++i) {
       std::string get_val;
       auto start = raft::util::NowTime();
-      auto stat = client->Get(p.first, &get_val);
+      auto stat = client->RouteGet(p.first, &get_val);
       auto dura = raft::util::DurationToMicros(start, raft::util::NowTime());
       if (stat.err == kv::kOk && get_val == p.second) {
         ++succ_cnt;

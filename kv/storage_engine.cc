@@ -46,6 +46,13 @@ class RocksDBEngine final : public StorageEngine {
     return stat.ok();
   }
 
+  bool Write(rocksdb::WriteBatch *batch) override {
+    auto wo = rocksdb::WriteOptions();
+    wo.sync = false;
+    auto stat = dbptr_->Write(wo, batch);
+    return stat.ok();
+  }
+
   void Close() override { dbptr_->Close(); }
 
  private:

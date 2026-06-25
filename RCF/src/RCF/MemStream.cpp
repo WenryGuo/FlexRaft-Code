@@ -44,18 +44,18 @@ namespace RCF {
         setg(mBuffer, mBuffer, mBuffer + mBufferLen);
     }
 
-    std::streambuf::int_type MemIstreamBuf::underflow()   
-    {   
+    std::streambuf::int_type MemIstreamBuf::underflow()
+    {
         if (gptr() < egptr())
         {
             return traits_type::to_int_type(*gptr());
         }
 
-        return traits_type::eof();   
+        return traits_type::eof();
     }
 
     MemIstreamBuf::pos_type MemIstreamBuf::seekoff(
-        MemIstreamBuf::off_type offset, 
+        MemIstreamBuf::off_type offset,
         std::ios_base::seekdir dir,
         std::ios_base::openmode mode)
     {
@@ -63,14 +63,15 @@ namespace RCF {
 
         char * pBegin = mBuffer;
         char * pEnd = mBuffer + mBufferLen;
-        
+
         char * pBase = NULL;
         switch(dir)
         {
             case std::ios::cur: pBase = gptr(); break;
             case std::ios::beg: pBase = pBegin; break;
             case std::ios::end: pBase = pEnd; break;
-            default: RCF_ASSERT_ALWAYS(""); break; 
+            default: /* invalid seekdir — return failure rather than crashing */
+                     return pos_type(-1);
         }
 
         char * pNewPos = pBase + offset;
@@ -123,7 +124,7 @@ namespace RCF {
     }
 
     MemOstreamBuf::pos_type MemOstreamBuf::seekoff(
-        MemOstreamBuf::off_type offset, 
+        MemOstreamBuf::off_type offset,
         std::ios_base::seekdir dir,
         std::ios_base::openmode mode)
     {
@@ -131,14 +132,15 @@ namespace RCF {
 
         char * pBegin = pbase();
         char * pEnd = epptr();
-        
+
         char * pBase = NULL;
         switch(dir)
         {
             case std::ios::cur: pBase = pptr(); break;
             case std::ios::beg: pBase = pBegin; break;
             case std::ios::end: pBase = pEnd; break;
-            default: RCF_ASSERT_ALWAYS(""); break; 
+            default: /* invalid seekdir — return failure rather than crashing */
+                     return pos_type(-1);
         }
 
         char * pNewPos = pBase + offset;

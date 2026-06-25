@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <map>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -18,15 +19,36 @@ struct Stripe {
   // std::vector<LogEntry> collected_fragments;
   std::map<raft_frag_id_t, LogEntry> collected_fragments;
 
+  // When true, fragments[] is keyed by destination peer id (packed multi-frag per node).
+  bool peer_keyed_fragments = false;
+
   size_t CollectFragmentsCount() const { return collected_fragments.size(); }
+
+  // LRC-related metadata for latency-aware orthogonal placement
+  // Note: FragmentPlacement is defined in multiraft::message.h
+  // These fields are used by LRC encoding and orthogonal placement
+  // --------------------------------------------------------------------------
+  int lrc_group_id = -1;  // which LRC group this stripe belongs to [-1 means unassigned]
+
+  // LRC mode: store all encoded fragments (k+l+r total) for peer-keyed packing
+  // These are stored by frag_id order: [0,k) data, [k,k+l) local parity, [k+l,k+l+r) global parity
+  std::vector<Slice> all_fragments;
 };
 
 // Encoder controls the encoding/decoding process of a raft log entry by
 // different parameters. The encoding and decoding of a raft entry is using an
 // RS erasure coding scheme
 class Encoder {
-  static constexpr int kMaxK = 9;
-  static constexpr int kMaxM = 9;
+  // Upper bounds on (k, m) that EncodeSlice/DecodeSlice support.
+  //
+  // Sized for the three encoding schemes used by multi-raft (with N=2F+1):
+  //   - RS_F  : k=F+1, m=F       → max k = 8, max m = 7  for N<=15
+  //   - RS_3F : k=F+1, m=3F+1    → max k = 8, max m = 22 for N<=15
+  //   - LRC   : RS(k, r) global with r=2N-k-l, l=2
+  //             → max k = 8, max r = 20 for N<=15
+  // We give some headroom for future N>15 / l>2 experiments.
+  static constexpr int kMaxK = 16;
+  static constexpr int kMaxM = 32;
 
   // The RS encoding process may require fragment length to be aligned. When
   // kAlignment = 1, there is no need to padding the alignment.
@@ -83,8 +105,18 @@ class Encoder {
   // rows should be picked in encode matrix and which are not
   std::vector<int> missing_rows_, valid_rows_;
 
+  // Owning buffer for the (padded) encoding input.
+  //
+  // EncodeSlice() pads the input slice to a multiple of `k * fragment_size`
+  // and stores the resulting bytes here, so that the data-shard `Slice`s
+  // returned in EncodingResults remain valid for the lifetime of this
+  // Encoder (or until the next EncodeSlice call). Keeping ownership on the
+  // Encoder avoids the use-after-free that occurred when `padded_data` was
+  // a function-local `unique_ptr`.
+  std::unique_ptr<char[]> padded_data_;
+
   // An array that stores the start pointer of each input fragments to be
-  // encoded
+  // encoded (points into padded_data_).
   unsigned char *encode_input_[kMaxK];
 
   // An array that stores the start pointer of each output fragments that have

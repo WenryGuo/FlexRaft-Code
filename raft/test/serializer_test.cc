@@ -86,7 +86,7 @@ public:
 
     // Construct the call back function
     RCF::Future<RCF::ByteBuffer> ret;
-    auto cmp_callback = [=]() { onComplete(ent, cmp, ret); };
+    auto cmp_callback = [=, this]() { onComplete(ent, cmp, ret); };
 
     ret = client.Echo(RCF::AsyncTwoway(cmp_callback), buffer);
     // When this function finishes, the 'client' object is freed and async
@@ -120,8 +120,13 @@ public:
   }
 
   auto GenerateRandomChunkInfo() -> ChunkInfo {
-    return ChunkInfo{static_cast<raft_encoding_param_t>(rand()),
-                     static_cast<raft_index_t>(rand())};
+    ChunkInfo ci;
+    ci.k = static_cast<raft_encoding_param_t>(rand() % 10 + 1);
+    ci.raft_index = static_cast<raft_index_t>(rand());
+    ci.l = static_cast<raft_encoding_param_t>(rand() % 5);
+    ci.r = static_cast<raft_encoding_param_t>(rand() % 5);
+    ci.lrc_group_id = rand() % 10;
+    return ci;
   }
 
   auto GenerateRandomLogEntry(bool generate_data, raft_entry_type type)
@@ -213,7 +218,10 @@ void SerializerTest::TestFragmentDataLogEntryTransfer(bool async) {
 void SerializerTest::TestSerializeRequestVoteArgs(bool async) {
   RequestVoteArgs args = RequestVoteArgs{
       static_cast<raft_term_t>(rand()), static_cast<raft_node_id_t>(rand()),
-      static_cast<raft_index_t>(rand()), static_cast<raft_term_t>(rand())};
+      static_cast<raft_index_t>(rand()), static_cast<raft_term_t>(rand()),
+      static_cast<raft_group_id_t>(0),   // group_id (default)
+      rand()                             // candidate_priority
+  };
 
   auto cmp = [](const RequestVoteArgs &a, const RequestVoteArgs &b) -> bool {
     return std::memcmp(&a, &b, sizeof(RequestVoteArgs)) == 0;
@@ -241,6 +249,7 @@ void SerializerTest::TestSerializeRequestVoteReply(bool async) {
 void SerializerTest::TestSerializeAppendEntriesArgs(bool async) {
   AppendEntriesArgs args = AppendEntriesArgs{
       static_cast<raft_term_t>(rand()),
+      static_cast<raft_group_id_t>(rand()),
       static_cast<raft_node_id_t>(rand()),
       static_cast<raft_index_t>(rand()),
       static_cast<raft_term_t>(rand()),
@@ -277,15 +286,16 @@ void SerializerTest::TestSerializeAppendEntriesArgs(bool async) {
 }
 
 void SerializerTest::TestSerializeAppendEntriesReply(bool async) {
-  AppendEntriesReply reply =
-      AppendEntriesReply{static_cast<raft_term_t>(rand()),
-                         rand(),
-                         static_cast<raft_index_t>(rand()),
-                         static_cast<raft_node_id_t>(rand()),
-                         0, // padding
-                         3,
-                         {GenerateRandomChunkInfo(), GenerateRandomChunkInfo(),
-                          GenerateRandomChunkInfo()}};
+  AppendEntriesReply reply;
+  reply.term = static_cast<raft_term_t>(rand());
+  reply.success = rand();
+  reply.expect_index = static_cast<raft_index_t>(rand());
+  reply.reply_id = static_cast<raft_node_id_t>(rand());
+  reply.group_id = 0;
+  reply.padding = 0;
+  reply.chunk_info_cnt = 3;
+  reply.chunk_infos = {GenerateRandomChunkInfo(), GenerateRandomChunkInfo(),
+                       GenerateRandomChunkInfo()};
 
   auto cmp = [](const AppendEntriesReply &lhs,
                 const AppendEntriesReply &rhs) -> bool {

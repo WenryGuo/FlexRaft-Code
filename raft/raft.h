@@ -1,19 +1,32 @@
 #pragma once
+#include <cassert>
 #include <chrono>
+#include <cstdint>
 #include <cstring>
 #include <map>
+#include <memory>
 #include <mutex>
+#include <random>
 #include <set>
 #include <unordered_map>
 
+#include "batch_system_bridge.h"
+#include "batch_transport.h"
 #include "encoder.h"
 #include "log_entry.h"
 #include "log_manager.h"
+#include "persist_queue.h"
 #include "raft_struct.h"
 #include "raft_type.h"
 #include "rpc.h"
 #include "rsm.h"
 #include "util.h"
+
+// Forward declarations for multi-raft types (to avoid circular dependencies)
+namespace multiraft {
+struct LrcParams;
+class LrcComplementaryGrouper;
+}  // namespace multiraft
 
 namespace raft {
 
@@ -27,18 +40,25 @@ enum RaftRole {
 };
 
 namespace config {
-const int64_t kHeartbeatInterval = 100;         // 100ms
+const int64_t kHeartbeatInterval = 200;         // 200ms
 const int64_t kCollectFragmentsInterval = 100;  // 100ms
 const int64_t kReplicateInterval = 1000;
-const int64_t kElectionTimeoutMin = 500;  // 500ms
+const int64_t kElectionTimeoutMin = 1000;  // 1000ms
 constexpr int kLivenessTimeoutInterval = 200;
-const int64_t kElectionTimeoutMax = 1000;  // 800ms
+const int64_t kElectionTimeoutMax = 1500;  // 1500ms
 };                                         // namespace config
+
+// Forward-declare RaftTransportHandler (defined in batch_transport.h).
+// RaftState inherits from it, so it needs to know the base class exists.
+class RaftTransportHandler;
 
 struct RaftConfig {
   // The node id of curernt peer. A node id is the unique identifier to
   // distinguish different raft peers
-  raft_node_id_t id;
+  raft_node_id_t id = 0;
+
+  // The raft group id for this RaftState instance (used in multi-raft)
+  raft_group_id_t group_id = 0;
 
   // The raft node id and corresponding network address of all raft peers
   // in current cluster. (including current server itself)
@@ -52,6 +72,30 @@ struct RaftConfig {
   int64_t electionTimeMin, electionTimeMax;
 
   Rsm *rsm;
+
+  // The number of physical nodes in the cluster (for leader balancing)
+  int N_physical_nodes = 0;
+
+  // For Multi-Raft: BatchSystemBridge pointer for committed entry application
+  void* batch_system_bridge = nullptr;
+  uint32_t bridge_group_id = 0;
+  uint32_t bridge_node_id = 0;
+
+  // Dynamic encoding parameter: fixed k for comparison experiments.
+  // 0 = auto (compute k = live_servers - F based on live server count)
+  // non-zero = use this fixed k for all encoding (m = N - k)
+  raft_encoding_param_t dynamic_k = 0;
+
+  int encoding_mode = 2; // 0=RS_F, 1=RS_3F, 2=LRC
+
+  // For Multi-Raft: BatchTransport pointer for batched outbound RPC.
+  // If set, RaftState sends via BatchTransport instead of direct rpc_clients_.
+  // Uses void* to avoid circular header dependency.
+  void* batch_transport = nullptr;
+
+  // Callback interface for routing RPC replies back to this RaftState.
+  // Set by RaftNode when constructing RaftConfig.
+  RaftTransportHandler* transport_handler = nullptr;
 };
 
 struct ProposeResult {
@@ -74,17 +118,23 @@ struct LivenessMonitor {
 
   void Init() {
     timer.Reset();
+    assert(me < kMaxNodeNum && "node id exceeds LivenessMonitor array bounds");
     response[me] = true;
     response_time[me] = 0;
   }
 
   void SetLivenessNumber(int num) {
-    for (int i = 0; i < std::min(num, node_num); ++i) {
+    for (int i = 0; i < std::min(num, std::min(node_num, kMaxNodeNum)); ++i) {
       response[i] = true;
     }
   }
 
   void UpdateLiveness(raft_node_id_t id) {
+    // Multi-Raft note: id is a global node ID, but node_num reflects local group size.
+    // If id is outside our local group's membership, skip the update.
+    if (id >= kMaxNodeNum || id >= static_cast<raft_node_id_t>(node_num)) {
+      return;
+    }
     response[id] = true;
     response_time[id] = timer.ElapseMilliseconds();
 
@@ -138,12 +188,18 @@ struct PreLeaderStripeStore {
   // [start_index, end_index] is the range of index that preLeader collects
   raft_index_t start_index, end_index;
   std::vector<Stripe> stripes;
-  bool response_[15];
+  static constexpr int kResponseCapacity = 32;
+  bool response_[kResponseCapacity];
   int node_num;
   raft_node_id_t me;
 
   void InitRequestFragmentsTask(raft_index_t start, raft_index_t end, int node_num,
                                 raft_node_id_t me) {
+    if (node_num > kResponseCapacity) {
+      fprintf(stderr, "[PreLeaderStripeStore] ERROR: node_num=%d exceeds capacity %d\n",
+              node_num, kResponseCapacity);
+      return;
+    }
     this->start_index = start;
     this->end_index = end;
     this->node_num = node_num;
@@ -162,16 +218,27 @@ struct PreLeaderStripeStore {
     }
 
     memset(response_, false, sizeof(response_));
-    response_[me] = true;
+    if (me < kResponseCapacity) {
+      response_[me] = true;
+    }
   }
 
-  void UpdateResponseState(raft_node_id_t id) { response_[id] = true; }
+  void UpdateResponseState(raft_node_id_t id) {
+    if (id >= 0 && id < node_num && id < kResponseCapacity) {
+      response_[id] = true;
+    }
+  }
 
-  bool IsCollected(raft_node_id_t id) const { return response_[id]; }
+  bool IsCollected(raft_node_id_t id) const {
+    if (id >= 0 && id < node_num && id < kResponseCapacity) {
+      return response_[id];
+    }
+    return false;
+  }
 
   int CollectedFragmentsCnt() const {
     int ret = 0;
-    for (int i = 0; i < node_num; ++i) {
+    for (int i = 0; i < node_num && i < kResponseCapacity; ++i) {
       ret += response_[i];
     }
     return ret;
@@ -207,7 +274,7 @@ class RaftPeer {
   std::unordered_map<raft_index_t, ChunkInfo> matchChunkInfo;
 };
 
-class RaftState {
+class RaftState : public RaftTransportHandler {
  public:
   // Construct a RaftState instance from a specified configuration.
   static RaftState *NewRaftState(const RaftConfig &);
@@ -243,6 +310,11 @@ class RaftState {
   void Process(RequestFragmentsArgs *args, RequestFragmentsReply *reply);
   void Process(RequestFragmentsReply *reply);
 
+  // RaftTransportHandler interface (inherited from RaftTransportHandler base)
+  void HandleRequestVoteReply(const RequestVoteReply& reply) override;
+  void HandleAppendEntriesReply(const AppendEntriesReply& reply) override;
+  void HandleRequestFragmentsReply(const RequestFragmentsReply& reply) override;
+
   // This is a command from upper level application, the raft instance is
   // supposed to copy this entry to its own log and replicate it to other
   // followers
@@ -267,6 +339,16 @@ class RaftState {
   raft_node_id_t VoteFor() const { return vote_for_; }
   void SetVoteFor(raft_node_id_t node) { vote_for_ = node; }
 
+  raft_group_id_t GroupId() const { return group_id_; }
+  void SetGroupId(raft_group_id_t gid) { group_id_ = gid; }
+
+  void SetPhysicalClusterSize(int N) { N_physical_nodes_ = N; }
+
+  // Set batch transport and transport handler after construction.
+  // Called by RaftNode::PostInit() to inject the transport layer.
+  void SetBatchTransport(void* transport) { batch_transport_ = transport; }
+  void SetTransportHandler(RaftTransportHandler* handler) { transport_handler_ = handler; }
+
   RaftRole Role() const { return role_; }
   void SetRole(RaftRole role) { role_ = role; }
 
@@ -280,6 +362,16 @@ class RaftState {
   raft_term_t TermAt(raft_index_t raft_index) const { return lm_->TermAt(raft_index); }
 
   int GetClusterServerNumber() const { return peers_.size() + 1; }
+  raft_node_id_t NodeId() const { return id_; }
+  int GetPhysicalClusterSize() const { return N_physical_nodes_; }
+
+  // Check if a given node is a member of this Group.
+  // peers_ contains all peer node IDs in this Group (populated from config.rpc_clients
+  // which is built from the per-group cluster config during RaftNode construction).
+  // Note: includes self (id_) as a member.
+  bool IsGroupMember(raft_node_id_t node_id) const {
+    return node_id == id_ || peers_.count(node_id) > 0;
+  }
 
   uint64_t CommitLatency(raft_index_t raft_index) const {
     if (commit_elapse_time_.count(raft_index) == 0) {
@@ -344,6 +436,10 @@ class RaftState {
   void convertToLeader();
   void convertToPreLeader();
 
+ private:
+  // Internal version of convertToLeader that assumes caller holds mtx_
+  void convertToLeaderInternal();
+
   void PersistRaftState();
 
   // A private function that is used to start a new election
@@ -367,6 +463,12 @@ class RaftState {
 
   // Send appendEntries messages to target raft peer
   void sendAppendEntries(raft_node_id_t peer);
+
+  // Multi-Raft: batch transport helpers — route all outbound RPCs through BatchTransport
+  // to avoid concurrent-call errors when multiple Raft groups share the same RcfClient.
+  void sendRequestVoteViaTransport(raft_node_id_t to, const RequestVoteArgs& args);
+  void sendAppendEntriesViaTransport(raft_node_id_t to, const AppendEntriesArgs& args);
+  void sendRequestFragmentsViaTransport(raft_node_id_t to, const RequestFragmentsArgs& args);
 
   void initLivenessMonitorState() { live_monitor_.Init(); }
 
@@ -433,6 +535,9 @@ class RaftState {
 
   // The id of current raft peer
   raft_node_id_t id_;
+
+  // The group id of this RaftState (used in multi-raft for logging)
+  raft_group_id_t group_id_;
 
   // Record current raft peer's state is Follower, or Candidate, or Leader
   RaftRole role_;
@@ -501,6 +606,18 @@ class RaftState {
   int64_t election_time_out_;
   int64_t heartbeatTimeInterval;
 
+  // Per-instance high-quality random number generator for election timeout
+  std::mt19937 rng_;
+
+  // Stagger offset for election timer start (Option A fix):
+  // Each group's preferred node starts its election timer at a different time
+  // to prevent cross-group election interference. In milliseconds.
+  int64_t election_timer_start_offset_ms_ = 0;
+
+  // Heartbeat timeout for leader failure fallback.
+  // Non-preferred followers wait this long before opening elections to non-preferred nodes.
+  int64_t heartbeat_timeout_ms_ = 10000;  // 10 seconds default
+
   // For calculating the commit latency
   std::unordered_map<raft_index_t, util::TimePoint> commit_start_time_;
 
@@ -513,12 +630,112 @@ class RaftState {
 
   int alive_servers_of_last_point_;
 
- private:
-  int vote_me_cnt_;
-  Rsm *rsm_;
+ public:
+  // Returns 0-based priority rank within the group. 0 = lowest priority,
+  // peers_.size() = highest priority.
+  int GetPriorityRank() const;
+
+  // Returns true if this node is eligible to become a candidate in the current round.
+  bool IsEligibleForElection() const;
+
+  // ========================================================================
+  // Dynamic Encoding Parameter API (for comparison experiments)
+  // ========================================================================
+  // Set fixed k for encoding. 0 = auto mode (k = live_servers - F).
+  // non-zero = use this fixed k for all entries (m = N - k).
+  void SetDynamicK(raft_encoding_param_t k) {
+    dynamic_k_ = k;
+    LOG(util::kRaft, "S%d SetDynamicK=%d [G%d]", id_, k, group_id_);
+  }
+  auto GetDynamicK() const -> raft_encoding_param_t { return dynamic_k_; }
+  bool HasFixedK() const { return dynamic_k_ != 0; }
+
+  int GetEncodingMode() const { return encoding_mode_; }
+  void SetEncodingMode(int mode) { encoding_mode_ = mode; }
 
   // Some report information about preleader phase
   util::TimePoint preleader_timepoint_;
   uint64_t preleader_recover_ent_cnt_ = 0;
+
+  // Set the RSM (Replicated State Machine) for applying committed log entries.
+  // Used in Multi-Raft mode to connect the KvServer's channel_ to the RaftNode
+  // after construction, so that committed entries flow through BOTH the
+  // BatchSystemBridge (ApplyFsm) and the RSM channel (ApplyRequestCommandThread).
+  void SetRsm(Rsm* rsm) { rsm_ = rsm; }
+
+  // ------------------------------------------------------------------------
+  // LRC Latency-Aware Complementary Grouping
+  // ------------------------------------------------------------------------
+  // Set the LRC complementary grouper for latency-aware orthogonal placement
+  void SetLrcGrouper(void* grouper) { lrc_grouper_ = grouper; }
+  // Check if LRC grouper is available
+  bool HasLrcGrouper() const { return lrc_grouper_ != nullptr; }
+
+ private:
+  int vote_me_cnt_;
+  Rsm *rsm_;
+
+  // Priority-based election: progressive round counter.
+  // Each round, more nodes are allowed to become candidates (top ceil(N/2) by node ID).
+  // Resets to 1 when a leader is elected or when starting a new election.
+  int election_round_ = 1;
+
+  // The number of physical nodes for leader balancing across groups.
+  int N_physical_nodes_ = 0;
+
+  // Dynamic encoding parameter: 0 = auto (k = live - F), non-zero = fixed k.
+  // Used for comparison experiments (e.g., fix k=3, k=5, k=7).
+  raft_encoding_param_t dynamic_k_ = 0;
+
+  // Encoding mode for Multi-Raft stripe EC: 0=RS_F, 1=RS_3F, 2=LRC.
+  int encoding_mode_ = 2;
+
+  // Multi-Raft: BatchSystemBridge for pushing committed entries to ApplyFsm mailbox
+  // (void* to avoid circular header dependency)
+  void* batch_system_bridge_ = nullptr;
+  uint32_t bridge_group_id_ = 0;
+  uint32_t bridge_node_id_ = 0;
+
+  // Multi-Raft: BatchTransport for batched outbound RPC.
+  // If set, use batch transport for sending; otherwise fall back to direct rpc_clients_.
+  // Uses void* to avoid circular header dependency.
+  void* batch_transport_ = nullptr;
+  // Callback for routing RPC replies back to this RaftState.
+  RaftTransportHandler* transport_handler_ = nullptr;
+
+  // ------------------------------------------------------------------------
+  // LRC Latency-Aware Complementary Grouping
+  // ------------------------------------------------------------------------
+  // Pointer to the LRC complementary grouper (owned by RaftStore, shared across groups)
+  void* lrc_grouper_ = nullptr;
+
+  // ------------------------------------------------------------------------
+  // PersistQueue - Asynchronous batch persistence
+  // ------------------------------------------------------------------------
+  // Pointer to the PersistQueue for asynchronous log persistence.
+  // Initialized in RaftState::NewRaftState() when storage != nullptr.
+  std::unique_ptr<PersistQueue> persist_queue_;
+
+  // Get the last index that has been persisted to disk
+  raft_index_t GetLastPersistedIndex() const {
+    if (persist_queue_) {
+      return persist_queue_->GetLastPersistedIndex();
+    }
+    return storage_ ? storage_->LastIndex() : 0;
+  }
+
+  // Encode entry using LRC with latency-aware orthogonal placement
+  // Returns the assigned LRC group ID for this stripe
+  // Note: placements are queried from lrc_grouper_ by the sendAppendEntriesLrc function
+  int EncodeRaftEntryLrc(raft_index_t raft_index, const multiraft::LrcParams& lrc_params,
+                         Stripe* stripe);
+
+  // Pack LRC-encoded fragments into peer-keyed format using lrc_grouper placement rules
+  // Each peer receives exactly the fragments assigned to it by GetFragmentsForNode()
+  void PackStripesToPeerKeyed(raft_index_t raft_index, Stripe* stripe, const std::string& user_key);
+
+  // Send entries using LRC orthogonal placement
+  // Each peer receives exactly 2 fragments based on latency-aware complementary grouping
+  void sendAppendEntriesLrc(raft_node_id_t peer, raft_index_t start_index, AppendEntriesArgs* args);
 };
 }  // namespace raft

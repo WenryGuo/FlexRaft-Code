@@ -1,5 +1,8 @@
 #pragma once
+#include <atomic>
 #include <functional>
+#include <thread>
+#include <vector>
 
 #include "RCF/ClientStub.hpp"
 #include "RCF/Future.hpp"
@@ -34,8 +37,6 @@ class KvServerRPCService {
   }
 
   GetValueResponse GetValue(const GetValueRequest &request) {
-    LOG(raft::util::kRaft, "S%d recv GetValue Request: readIndex=%d", server_->Id(),
-        request.read_index);
     raft::util::Timer timer;
     timer.Reset();
     // Spin until the entries before read index have been applied into the DB
@@ -44,7 +45,6 @@ class KvServerRPCService {
     }
     std::string value;
     auto found = server_->DB()->Get(request.key, &value);
-    LOG(raft::util::kRaft, "S%d make GetValue Response", server_->Id());
     if (found) {
       return GetValueResponse{std::move(value), kOk, server_->Id()};
     } else {
@@ -62,19 +62,29 @@ class KvServerRPCService {
 // simply call "DealWithRequest()". The call is synchronized and might be
 // blocked. We need a timeout to solve this problem.
 //
-// Each KvServerRPCClient object responds to a KvNode
+// Each KvServerRPCClient object responds to a KvNode.
+// A pool of RcfClient instances is used to support concurrent calls from
+// multiple threads — RcfClient is NOT thread-safe.
 class KvServerRPCClient {
  public:
-  using ClientPtr = std::shared_ptr<RcfClient<I_KvServerRPCService>>;
-  KvServerRPCClient(const NetAddress &net_addr, raft::raft_node_id_t id)
+  static constexpr int kRPCTimeout = 30000;  // 30s (increased from 10s)
+
+  explicit KvServerRPCClient(const NetAddress& net_addr,
+                             raft::raft_node_id_t id,
+                             int pool_size = 2)
       : address_(net_addr),
         id_(id),
-        client_stub_(RCF::TcpEndpoint(net_addr.ip, net_addr.port)),
-        rcf_init_() {
-    client_stub_.getClientStub().getTransport().setMaxIncomingMessageLength(
-        raft::rpc::config::kMaxMessageLength);
-    client_stub_.getClientStub().getTransport().setMaxOutgoingMessageLength(
-        raft::rpc::config::kMaxMessageLength);
+        rcf_init_(),
+        pool_index_(0),
+        pool_size_(pool_size) {
+    RCF::TcpEndpoint ep(net_addr.ip, net_addr.port);
+    for (int i = 0; i < pool_size_; ++i) {
+      client_pool_.emplace_back(ep);
+      auto& stub = client_pool_.back().getClientStub();
+      stub.getTransport().setMaxIncomingMessageLength(raft::rpc::config::kMaxMessageLength);
+      stub.getTransport().setMaxOutgoingMessageLength(raft::rpc::config::kMaxMessageLength);
+      stub.setRemoteCallTimeoutMs(kRPCTimeout);
+    }
   }
 
   Response DealWithRequest(const Request &request);
@@ -86,42 +96,95 @@ class KvServerRPCClient {
 
   GetValueResponse GetValue(const GetValueRequest &request);
 
-  // Set timeout for this RPC call, a typical value might be 300ms?
-  void SetRPCTimeOutMs(int cnt) { client_stub_.getClientStub().setRemoteCallTimeoutMs(cnt); }
+  // Expose the address for callers that need to construct a thread-local clone
+  // (e.g. parallel fragment fetch in stripe_read). RcfClient instances inside
+  // the connection pool are NOT thread-safe, so each jthread must use its own.
+  const NetAddress& GetAddress() const { return address_; }
+
+  void SetRPCTimeOutMs(int cnt) {
+    for (auto &client : client_pool_) {
+      client.getClientStub().setRemoteCallTimeoutMs(cnt);
+    }
+  }
 
  private:
+  RcfClient<I_KvServerRPCService> &NextClient() {
+    int idx = pool_index_.fetch_add(1, std::memory_order_relaxed) % pool_size_;
+    // #region agent log
+    static std::atomic<int> call_count{0};
+    int current_count = call_count.fetch_add(1, std::memory_order_relaxed);
+    // fprintf(stderr, "[DEBUG-8de3d8] NextClient thread=%ld client_id=%d pool_size=%d idx=%d call=%d\n",
+    //         (long)std::hash<std::thread::id>{}(std::this_thread::get_id()),
+    //         id_, pool_size_, idx, current_count);
+    // fflush(stderr);
+    // #endregion
+    return client_pool_[idx];
+  }
+
   RCF::RcfInit rcf_init_;
   NetAddress address_;
   raft::raft_node_id_t id_;
-  RcfClient<I_KvServerRPCService> client_stub_;
+  std::vector<RcfClient<I_KvServerRPCService>> client_pool_;
+  std::atomic<int> pool_index_;
+  int pool_size_;
 };
 
 // Server side of a KvNode, the server calls Start() to continue receive
 // RPC request from client and deal with it.
 class KvServerRPCServer {
  public:
-  KvServerRPCServer(const NetAddress &net_addr, raft::raft_node_id_t id, KvServerRPCService service)
+  KvServerRPCServer(const NetAddress &net_addr, raft::raft_node_id_t id)
       : address_(net_addr),
         id_(id),
         server_(RCF::TcpEndpoint(net_addr.ip, net_addr.port)),
-        service_(service) {
-    LOG(raft::util::kRaft, "S%d RPC init with (ip=%s port=%d)", id_, net_addr.ip.c_str(),
+        started_(false) {
+    fprintf(stderr, "[KV-RPC-SERVER-%d] RPC init (ip=%s port=%d)\n", id_, net_addr.ip.c_str(),
         net_addr.port);
   }
   KvServerRPCServer() = default;
 
+  bool IsStarted() const { return started_.load(std::memory_order_acquire); }
+
   void Start() {
-    server_.getServerTransport().setMaxIncomingMessageLength(raft::rpc::config::kMaxMessageLength);
-    server_.bind<I_KvServerRPCService>(service_);
-    server_.start();
+    bool expected = false;
+    if (!started_.compare_exchange_strong(expected, true)) {
+      return;  // Already started — idempotent
+    }
+    try {
+      server_.getServerTransport().setMaxIncomingMessageLength(raft::rpc::config::kMaxMessageLength);
+      // Dynamic thread pool sizing for KV RPC server.
+      // Same formula as Raft Unified RPC Server (raft/raft_unified_rpc_server.cc):
+      //   max(16, groups * 2)
+      // The 7-group localtest config yields 16 threads (matches the minimum
+      // used by the Raft RPC server, ensuring KV RPC concurrency does not
+      // bottleneck YCSB client traffic).
+      constexpr int kKvRpcThreadCount = 16;
+      RCF::ThreadPoolPtr tp(new RCF::ThreadPool(kKvRpcThreadCount));
+      server_.setThreadPool(tp);
+      server_.start();
+    } catch (const std::exception& e) {
+      fprintf(stderr, "[KV-RPC-SERVER-%d] Start() failed: %s\n", id_, e.what());
+      started_.store(false, std::memory_order_release);
+      throw;
+    } catch (...) {
+      fprintf(stderr, "[KV-RPC-SERVER-%d] Start() failed: unknown exception\n", id_);
+      started_.store(false, std::memory_order_release);
+      throw;
+    }
   }
 
   void Stop() {
-    LOG(raft::util::kRaft, "S%d stop RPC server", id_);
+    fprintf(stderr, "[KV-RPC-SERVER-%d] stop RPC server\n", id_);
+    started_.store(false, std::memory_order_release);
     server_.stop();
   }
 
   void SetServiceContext(KvServer *server) { service_.SetKvServer(server); }
+
+  template <typename ServiceT>
+  void BindService(ServiceT* service) {
+    server_.bind<I_KvServerRPCService>(*service);
+  }
 
  private:
   RCF::RcfInit rcf_init_;
@@ -129,6 +192,7 @@ class KvServerRPCServer {
   raft::raft_node_id_t id_;
   RCF::RcfServer server_;
   KvServerRPCService service_;
+  std::atomic<bool> started_{false};
 };
 
 }  // namespace rpc

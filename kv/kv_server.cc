@@ -51,6 +51,59 @@ KvServer *KvServer::NewKvServer(const KvClusterConfig &config, raft::raft_node_i
   return kv_server;
 }
 
+KvServer *KvServer::NewKvServerWithExternalRaftNode(const KvClusterConfig &config,
+                                                   raft::raft_node_id_t node_id,
+                                                   raft::RaftNode *external_raft_node) {
+  assert(config.count(node_id) > 0);
+  auto kv_node_config = config.at(node_id);
+
+  auto kv_server = new KvServer();
+  kv_server->id_ = node_id;
+  kv_server->raft_ = external_raft_node;
+  kv_server->raft_owned_ = false;  // externally owned, don't delete in destructor
+
+  // Create channel for RSM communication
+  kv_server->channel_ = Channel::NewChannel(100000);
+  kv_server->db_ = StorageEngine::Default(kv_node_config.kv_dbname);
+
+  // Register the KV RPC clients to other peers
+  for (const auto &[id, conf] : config) {
+    if (id == node_id) {
+      continue;
+    }
+    kv_server->kv_peers_.insert({id, new rpc::KvServerRPCClient(conf.kv_rpc_addr, id)});
+  }
+
+  kv_server->exit_ = false;
+  return kv_server;
+}
+
+// NewKvServerWithoutRaft: creates KvServer without a RaftNode.
+// Used in Multi-Raft where RaftNode is managed externally.
+KvServer *KvServer::NewKvServerWithoutRaft(const KvClusterConfig &config,
+                                           raft::raft_node_id_t node_id) {
+  assert(config.count(node_id) > 0);
+  auto kv_node_config = config.at(node_id);
+
+  auto kv_server = new KvServer();
+  kv_server->id_ = node_id;
+  kv_server->raft_ = nullptr;
+  kv_server->raft_owned_ = false;  // no raft to own
+
+  kv_server->channel_ = Channel::NewChannel(100000);
+  kv_server->db_ = StorageEngine::Default(kv_node_config.kv_dbname);
+
+  for (const auto &[id, conf] : config) {
+    if (id == node_id) {
+      continue;
+    }
+    kv_server->kv_peers_.insert({id, new rpc::KvServerRPCClient(conf.kv_rpc_addr, id)});
+  }
+
+  kv_server->exit_ = false;
+  return kv_server;
+}
+
 void KvServer::Start() {
   raft_->Start();
   startApplyKvRequestCommandsThread();
@@ -59,6 +112,12 @@ void KvServer::Start() {
 // A server receives a request from outside world(e.g. A client or a mock
 // client) and it should deal with this request properly
 void KvServer::DealWithRequest(const Request *request, Response *resp) {
+  // Zero-initialize fields that may not be set on all code paths (prevents garbage
+  // latency values from being returned to the client).
+  resp->apply_elapse_time = 0;
+  resp->commit_elapse_time = 0;
+
+  // [COMMENTED] DealWithRequest log (runtime verbose)
   if (IsDisconnected()) {
     resp->err = kRequestExecTimeout;
     return;
@@ -69,58 +128,50 @@ void KvServer::DealWithRequest(const Request *request, Response *resp) {
   resp->type = request->type;
   resp->client_id = request->client_id;
   resp->sequence = request->sequence;
-  resp->raft_term = raft_->getRaftState()->CurrentTerm();
+  if (raft_ != nullptr) {
+    resp->raft_term = raft_->getRaftState()->CurrentTerm();
+  } else {
+    resp->raft_term = 0;
+  }
   resp->reply_server_id = id_;
 
   switch (request->type) {
     case kDetectLeader:
-      resp->err = raft_->IsLeader() ? kOk : kNotALeader;
+      resp->err = (raft_ != nullptr && raft_->IsLeader()) ? kOk : kNotALeader;
       LOG(raft::util::kRaft, "S%d reply DetectLeader term:%d err:%s", Id(), resp->raft_term,
           ToString(resp->err).c_str());
       return;
+
     case kAbort:
-      resp->err = raft_->IsLeader() ? kOk : kNotALeader;
-      if (raft_->IsLeader()) {
+      resp->err = (raft_ != nullptr && raft_->IsLeader()) ? kOk : kNotALeader;
+      if (raft_ != nullptr && raft_->IsLeader()) {
         abort();
       }
+      return;
+
     case kPut:
     case kDelete: {
-      auto size = GetRawBytesSizeForRequest(*request);
-      auto data = new char[size + 12];
-      RequestToRawBytes(*request, data);
-
-      // find the start offset, it must contain the request Header and the key
-      // content
-      int start_offset = RequestHdrSize() + sizeof(int) + request->key.size();
-
-      LOG(raft::util::kRaft, "S%d propose request startoffset(%d)", id_, start_offset);
-
-      // Construct a raft command
-      raft::util::Timer commit_timer;
-      commit_timer.Reset();
-
-      auto cmd = raft::CommandData{start_offset, raft::Slice(data, size)};
-      auto pr = raft_->Propose(cmd);
-
-      // Loop until the propose entry to be applied
-      raft::util::Timer timer;
-      timer.Reset();
-      KvRequestApplyResult ar;
-      while (timer.ElapseMilliseconds() <= 300) {
-        // Check if applied
-        if (CheckEntryCommitted(pr, &ar)) {
-          resp->err = ar.err;
-          resp->value = ar.value;
-          resp->apply_elapse_time = ar.elapse_time;
-          // Calculate the time elapsed for commit
-          resp->commit_elapse_time = commit_timer.ElapseMicroseconds() - resp->apply_elapse_time;
-          // resp->commit_elapse_time = raft_->CommitLatency(pr.propose_index);
-          LOG(raft::util::kRaft, "S%d ApplyResult value=%s", id_, resp->value.c_str());
-          return;
-        }
+      // ---- 兼容 Multi-Raft 模式：raft_ 可能为 nullptr ----
+      if (raft_ == nullptr) {
+        resp->err = kNotALeader;
+        resp->raft_term = 0;
+        LOG(raft::util::kRaft, "S%d kPut/kDelete rejected: raft_ is null (Multi-Raft mode)", Id());
+        return;
       }
-      // Otherwise timesout
-      resp->err = kRequestExecTimeout;
+      if (!raft_->IsLeader()) {
+        resp->err = kNotALeader;
+        resp->raft_term = raft_->getRaftState()->CurrentTerm();
+        LOG(raft::util::kRaft, "S%d kPut/kDelete rejected: not leader (term=%d)", Id(), resp->raft_term);
+        return;
+      }
+
+      // In Multi-Raft + Erasure Coding mode, writes are handled via
+      // GroupRegistry::DealWithRequest -> StripePut -> encoded fragments stored
+      // via ApplyFsm. KvServer::DealWithRequest should never be reached.
+      // Return error to force the client to use the correct routing path.
+      resp->err = kNotALeader;
+      resp->raft_term = raft_->getRaftState()->CurrentTerm();
+      LOG(raft::util::kRaft, "S%d kPut/kDelete rejected: use GroupRegistry routing path", Id());
       return;
     }
 
@@ -246,7 +297,8 @@ void KvServer::ExecuteGetOperation(const Request *request, Response *resp) {
   input.insert({format.frag_id, raft::Slice::Copy(format.frag)});
   LOG(raft::util::kRaft, "[S%d] Add Fragment of Frag%d", Id(), format.frag_id);
 
-  ValueGatheringTask task{request->key, resp->read_index, resp->reply_server_id, &input, k, m};
+  ValueGatheringTask task{request->key,  resp->read_index, resp->reply_server_id,
+                          &input,       k,                m};
   ValueGatheringTaskResults res{&(resp->value), kOk};
 
   DoValueGatheringTask(&task, &res);
@@ -329,13 +381,13 @@ void KvServer::DoValueGatheringTask(ValueGatheringTask *task, ValueGatheringTask
     }
   };
 
-  auto clear_gather_ctx = [=]() {
+  auto clear_gather_ctx = [=, this]() {
     for (auto &[_, frag] : *(task->decode_input)) {
       delete[] frag.data();
     }
   };
 
-  auto get_req = GetValueRequest{task->key, task->read_index};
+    auto get_req = GetValueRequest{task->key, task->read_index, task->group_id};
   for (auto &[id, server] : kv_peers_) {
     if (id == task->replied_id) {
       continue;

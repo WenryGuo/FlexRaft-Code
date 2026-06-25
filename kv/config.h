@@ -7,6 +7,7 @@
 namespace kv {
 struct KvServiceNodeConfig {
   raft::raft_node_id_t id;
+  raft::raft_group_id_t group_id;
   rpc::NetAddress kv_rpc_addr;
   raft::rpc::NetAddress raft_rpc_addr;
   std::string raft_log_filename;

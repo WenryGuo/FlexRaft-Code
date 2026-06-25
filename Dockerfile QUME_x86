@@ -36,18 +36,21 @@ RUN python3 /tmp/install_dependencies.py
 # 再手动安装rocksdb，脚本先安装它的依赖项
 COPY rocksdb /tmp/rocksdb
 RUN cd /tmp/rocksdb && \
-    cmake -B build -DCMAKE_INSTALL_PREFIX=/usr && \
+    cmake -B build \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_CXX_FLAGS="-Wno-error=maybe-uninitialized" && \
     cmake --build build && \
     cd build && \
     make install && \
     rm -rf /tmp/rocksdb
 # 再手动安装 isa-l 源码，复制到容器
 COPY isa-l /tmp/isa-l
-# 编译并安装 isa-l
+# 编译并安装 isa-l（拆成两层：先 build，再 install，避免并行编译冲掉 install）
 RUN cd /tmp/isa-l && \
     ./autogen.sh && \
-    ./configure --prefix=/usr --libdir=/usr/lib  && \
-    make -j$(nproc) && \
+    ./configure --prefix=/usr --libdir=/usr/lib && \
+    make -j$(nproc)
+RUN cd /tmp/isa-l && \
     make install && \
     ldconfig && \
     rm -rf /tmp/isa-l
@@ -61,18 +64,12 @@ RUN apt-get update && apt-get install -y uuid-dev\
 WORKDIR /flexraft
 COPY . .
 
-# # 测试，看看kv有什么问题
-# RUN mkdir -p build && cd build \
-#     && cmake .. -DCMAKE_BUILD_TYPE=Release -Wno-deprecated-declarations\
-#     && make kv -j$(nproc)
+# 编译（Release 版本）
+RUN cmake -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -Wno-deprecated-declarations && \
+    cmake --build build -j$(nproc)
 
-# RUN cp /tmp/kv_build.log /host/
-
-# # 编译
-# RUN mkdir build && cd build \
-#  && cmake .. -DCMAKE_BUILD_TYPE=Release \
-#  && make -j$(nproc)
-
-# # 设置环境变量与默认命令
+# 设置环境变量与默认命令
 ENV PATH="/flexraft/build/bench:$PATH"
 CMD ["bash"]

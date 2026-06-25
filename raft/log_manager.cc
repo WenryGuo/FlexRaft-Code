@@ -10,9 +10,10 @@
 
 namespace raft {
 // A default deleter that release dynamically allocated memory
+// FIX: LogEntry destructor (~LogEntry) already frees all owned memory
+// (including fragments_ vector elements). Don't call delete[] here
+// or it will cause double-free.
 void default_Deleter(LogEntry *entry) {
-  delete[] entry->NotEncodedSlice().data();
-  delete[] entry->FragmentSlice().data();
   entry->~LogEntry();
 }
 
@@ -99,6 +100,11 @@ Status LogManager::ensureCapacity(int entry_cnt) {
 }
 
 Status LogManager::appendEntryHelper(const LogEntry &entry) {
+  // [DEBUG] Log entry storage
+  fprintf(stderr, "[LOG-MGR] appendEntryHelper: idx=%d, frags=%zu, placement=%zu\n",
+          entry.Index(), entry.Fragments().size(), entry.Placement().size());
+  fflush(stderr);
+
   Status stat;
   if ((stat = ensureCapacity(1)) != 0) {
     return stat;
@@ -108,16 +114,52 @@ Status LogManager::appendEntryHelper(const LogEntry &entry) {
   back_ = (back_ + 1) % Capacity();
   ++count_;
 
+  // [DEBUG] Log after storage
+  // Note: back_ has been incremented, so we need to read the previous slot.
+  // Calculate previous back_ position
+  int prev_back = (back_ - 1 + Capacity()) % Capacity();
+  fprintf(stderr, "[LOG-MGR] appendEntryHelper: stored idx=%d\n", entries_[prev_back].Index());
+  fflush(stderr);
+
   return kOk;
 }
 
 Status LogManager::AppendLogEntry(const LogEntry &entry) {
+  // [DEBUG] LogManager::AppendLogEntry: entry_idx=%d
+  fprintf(stderr, "[DEBUG-LOG-MGR] AppendLogEntry: idx=%d\n", entry.Index());
+  fflush(stderr);
+
   std::lock_guard<std::mutex> lock(mtx_);
   auto stat = appendEntryHelper(entry);
   if (stat == kOk && persister_ != nullptr) {
     // persister_->PersistNewLogEntry(entry);
   }
+  // [DEBUG] LogManager::AppendLogEntry: success, idx=%d
+  fprintf(stderr, "[DEBUG-LOG-MGR] AppendLogEntry: done idx=%d\n", entry.Index());
+  fflush(stderr);
   return stat;
+}
+
+AppendResult LogManager::AppendLogEntryAtomic(const LogEntry &entry) {
+  std::lock_guard<std::mutex> lock(mtx_);
+
+  // Compute the index that will be assigned (atomically with append)
+  raft_index_t allocated_index = LastLogEntryIndex() + 1;
+
+  // Make a copy with the correct index assigned
+  LogEntry entry_with_index = entry;
+  entry_with_index.SetIndex(allocated_index);
+
+  // Append to ring buffer
+  auto stat = appendEntryHelper(entry_with_index);
+  if (stat != kOk) {
+    return {0, stat};
+  }
+
+  LOG(util::kRaft, "LM: AtomicAppend I%d (ptr=%p)", allocated_index,
+      entry_with_index.CommandData().data());
+
+  return {allocated_index, kOk};
 }
 
 Status LogManager::DeleteLogEntriesFrom(raft_index_t idx) {
@@ -195,6 +237,14 @@ Status LogManager::DiscardLogEntriesBefore(raft_index_t idx) {
   front_ = start_idx;
   count_ -= discard_cnt;
 
+  // Notify LRC cache cleanup for discarded entries
+  if (lrc_cache_cleanup_cb_ && discard_cnt > 0) {
+    raft_index_t old_base = dest;  // The base before update
+    for (int i = 0; i < discard_cnt; ++i) {
+      lrc_cache_cleanup_cb_(old_base + i);
+    }
+  }
+
   // TODO: The persister must atomically persist this change
   return kOk;
 }
@@ -211,11 +261,12 @@ LogEntry *LogManager::GetSingleLogEntry(raft_index_t idx) {
 }
 
 Status LogManager::GetEntryObject(raft_index_t idx, LogEntry *ent) {
-  auto ptr = GetSingleLogEntry(idx);
-  if (ptr == nullptr) {
+  std::lock_guard<std::mutex> lock(mtx_);
+
+  if (Count() <= 0 || idx < base_ || idx > LastLogEntryIndex()) {
     return kIndexBeyondRange;
   }
-  *ent = *ptr;
+  *ent = entries_[raftIndexToArrayIndex(idx)];
   return kOk;
 }
 

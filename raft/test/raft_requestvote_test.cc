@@ -130,6 +130,12 @@ class RaftElectionTest : public ::testing::Test {
     }
 
     void sendMessage(const RequestFragmentsArgs &args) override {}
+    void sendAsyncMessage(const AppendEntriesArgs &args) override {
+      appendentries_channel_->push_back(args);
+    }
+    void sendAsyncMessage(const RequestVoteArgs &args) override {
+      requestvote_channel_->push_back(args);
+    }
     void setState(void *) override {}
     void stop() override {}
     void recover() override {}
@@ -167,7 +173,11 @@ static StorageMock *BuildStorage(std::vector<Entry> entries) {
 }
 
 TEST_F(RaftRequestVoteTest, TestRequestVoteGrantWithNoLogEntry) {
-  RaftConfig config = {1, {{1, nullptr}, {2, nullptr}, {3, nullptr}}, nullptr};
+  RaftConfig config = {
+      .id = 1,
+      .group_id = 1,
+      .rpc_clients = {{1, nullptr}, {2, nullptr}, {3, nullptr}},
+      .storage = nullptr};
   auto raft = RaftState::NewRaftState(config);
 
   raft->SetCurrentTerm(1);
@@ -189,7 +199,11 @@ TEST_F(RaftRequestVoteTest, TestRequestVoteWhenAlreadyVote) {
   const raft_node_id_t vote_for = 1;
   const raft_node_id_t req_node = 2;
 
-  RaftConfig config = {1, {{1, nullptr}, {2, nullptr}, {3, nullptr}}, nullptr};
+  RaftConfig config = {
+      .id = 1,
+      .group_id = 1,
+      .rpc_clients = {{1, nullptr}, {2, nullptr}, {3, nullptr}},
+      .storage = nullptr};
   auto raft = RaftState::NewRaftState(config);
 
   raft->SetCurrentTerm(1);
@@ -217,7 +231,11 @@ TEST_F(RaftRequestVoteTest, TestRequestVoteAcceptIfLogIsNewer) {
   const raft_node_id_t req_node = 2;
 
   auto storage = BuildStorage({{1, 1}, {1, 2}, {2, 3}});
-  RaftConfig config = {1, {{1, nullptr}, {2, nullptr}, {3, nullptr}}, storage};
+  RaftConfig config = {
+      .id = 1,
+      .group_id = 1,
+      .rpc_clients = {{1, nullptr}, {2, nullptr}, {3, nullptr}},
+      .storage = storage};
   auto raft = RaftState::NewRaftState(config);
 
   raft->SetCurrentTerm(2);
@@ -245,7 +263,11 @@ TEST_F(RaftRequestVoteTest, TestRequestVoteRefuseIfLogIsOld) {
   const raft_node_id_t req_node = 2;
 
   auto storage = BuildStorage({{1, 1}, {1, 2}, {2, 3}});
-  RaftConfig config = {1, {{1, nullptr}, {2, nullptr}, {3, nullptr}}, storage};
+  RaftConfig config = {
+      .id = 1,
+      .group_id = 1,
+      .rpc_clients = {{1, nullptr}, {2, nullptr}, {3, nullptr}},
+      .storage = storage};
   auto raft = RaftState::NewRaftState(config);
 
   raft->SetCurrentTerm(2);
@@ -268,7 +290,11 @@ TEST_F(RaftRequestVoteTest, TestRequestVoteRefuseIfLogIsOld) {
 TEST_F(RaftHandleRequestVoteReplyTest, TestUpdateTermIfReplyTermIsHigher) {
   const raft_node_id_t req_node = 1;
 
-  RaftConfig config = {1, {{1, nullptr}, {2, nullptr}, {3, nullptr}}, nullptr};
+  RaftConfig config = {
+      .id = 1,
+      .group_id = 1,
+      .rpc_clients = {{1, nullptr}, {2, nullptr}, {3, nullptr}},
+      .storage = nullptr};
   auto raft = RaftState::NewRaftState(config);
 
   raft->SetCurrentTerm(1);
@@ -293,7 +319,11 @@ TEST_F(RaftHandleRequestVoteReplyTest, TestUpdateTermIfReplyTermIsHigher) {
 TEST_F(RaftHandleRequestVoteReplyTest, DISABLED_TestConvertToBeLeaderIfWinMajorityVote) {
   const raft_node_id_t req_node = 1;
 
-  RaftConfig config = {1, {{1, nullptr}, {2, nullptr}, {3, nullptr}}, nullptr};
+  RaftConfig config = {
+      .id = 1,
+      .group_id = 1,
+      .rpc_clients = {{1, nullptr}, {2, nullptr}, {3, nullptr}},
+      .storage = nullptr};
   auto raft = RaftState::NewRaftState(config);
 
   raft->SetCurrentTerm(1);
@@ -319,7 +349,13 @@ TEST_F(RaftElectionTest, TestStartElectionIfTimeOut) {
   RpcClientMock::AppendEntriesMsgChannel channel2;
   RpcClientMock rpc2(&channel1, &channel2);
   RpcClientMock rpc3(&channel1, &channel2);
-  RaftConfig config = {1, {{1, nullptr}, {2, &rpc2}, {3, &rpc3}}, nullptr, 150, 200};
+  RaftConfig config = {
+      .id = 1,
+      .group_id = 1,
+      .rpc_clients = {{1, nullptr}, {2, &rpc2}, {3, &rpc3}},
+      .storage = nullptr,
+      .electionTimeMin = 150,
+      .electionTimeMax = 200};
   auto raft = RaftState::NewRaftState(config);
   raft->SetRole(kFollower);
 
@@ -347,7 +383,13 @@ TEST_F(RaftElectionTest, TestRestartElectionIfNotReceiveReply) {
   RpcClientMock::AppendEntriesMsgChannel channel2;
   RpcClientMock rpc2(&channel1, &channel2);
   RpcClientMock rpc3(&channel1, &channel2);
-  RaftConfig config = {1, {{1, nullptr}, {2, &rpc2}, {3, &rpc3}}, nullptr, 150, 200};
+  RaftConfig config = {
+      .id = 1,
+      .group_id = 1,
+      .rpc_clients = {{1, nullptr}, {2, &rpc2}, {3, &rpc3}},
+      .storage = nullptr,
+      .electionTimeMin = 150,
+      .electionTimeMax = 200};
   auto raft = RaftState::NewRaftState(config);
   raft->SetRole(kFollower);
 
@@ -383,7 +425,13 @@ TEST_F(RaftElectionTest, TestBecomeLeaderIfWinMajorityReply) {
   RpcClientMock::AppendEntriesMsgChannel channel2;
   RpcClientMock rpc2(&channel1, &channel2);
   RpcClientMock rpc3(&channel1, &channel2);
-  RaftConfig config = {1, {{1, nullptr}, {2, &rpc2}, {3, &rpc3}}, nullptr, 150, 200};
+  RaftConfig config = {
+      .id = 1,
+      .group_id = 1,
+      .rpc_clients = {{1, nullptr}, {2, &rpc2}, {3, &rpc3}},
+      .storage = nullptr,
+      .electionTimeMin = 150,
+      .electionTimeMax = 200};
   auto raft = RaftState::NewRaftState(config);
   raft->SetRole(kFollower);
 
@@ -406,7 +454,7 @@ TEST_F(RaftElectionTest, TestBecomeLeaderIfWinMajorityReply) {
 
   // Check if heartbeat messages are sent correctly
   auto ref_appendentries_args =
-      AppendEntriesArgs{1, 1, 0, 0, 0, 0, 0, std::vector<LogEntry>()};
+      AppendEntriesArgs{1, 0, 1, 0, 0, 0, 0, 0, std::vector<LogEntry>()};
 
   for (const auto &entry : channel2) {
     ASSERT_TRUE(AppendEntriesArgsEqual(ref_appendentries_args, entry));
@@ -418,7 +466,13 @@ TEST_F(RaftElectionTest, TestConvertToFollowerIfFindHigherTerm) {
   RpcClientMock::AppendEntriesMsgChannel channel2;
   RpcClientMock rpc2(&channel1, &channel2);
   RpcClientMock rpc3(&channel1, &channel2);
-  RaftConfig config = {1, {{1, nullptr}, {2, &rpc2}, {3, &rpc3}}, nullptr, 150, 200};
+  RaftConfig config = {
+      .id = 1,
+      .group_id = 1,
+      .rpc_clients = {{1, nullptr}, {2, &rpc2}, {3, &rpc3}},
+      .storage = nullptr,
+      .electionTimeMin = 150,
+      .electionTimeMax = 200};
   auto raft = RaftState::NewRaftState(config);
   raft->SetRole(kFollower);
 

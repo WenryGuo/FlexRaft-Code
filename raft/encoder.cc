@@ -23,6 +23,22 @@ bool Encoder::EncodeSlice(const Slice &slice, int k, int m, EncodingResults *res
     return true;
   }
 
+  // Pad data to a multiple of k bytes so all fragments have equal size.
+  // This prevents the decoder from over-reading the last (short) fragment.
+  //
+  // IMPORTANT: padded_data_ is a member (owning), so the Slices returned for
+  // i<k below — which point into this buffer — stay valid as long as this
+  // Encoder is alive and EncodeSlice has not been called again. A previous
+  // version of this code used a function-local unique_ptr here, which caused
+  // a use-after-free whenever the caller allocated anything between the
+  // EncodeSlice return and reading results[0..k-1].
+  auto padded_size = fragment_size * k;
+  padded_data_.reset(new char[padded_size]);
+  std::memcpy(padded_data_.get(), slice.data(), slice.size());
+  // Zero out the padding bytes (optional but clean)
+  std::memset(padded_data_.get() + slice.size(), 0, padded_size - slice.size());
+  start_ptr = reinterpret_cast<unsigned char *>(padded_data_.get());
+
   // set input vector
   for (int i = 0; i < k; i++, start_ptr += fragment_size) {
     encode_input_[i] = start_ptr;

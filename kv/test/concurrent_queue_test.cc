@@ -11,7 +11,7 @@ class ConcurrentQueueTest : public ::testing::Test {
  public:
   template <typename T>
   void LaunchProducerThread(ConcurrentQueue<T>* queue, const std::vector<T>& data) {
-    auto producer = [=]() {
+    auto producer = [=, this]() {
       std::for_each(data.begin(), data.end(), [=](const T& ent) { queue->Push(ent); });
     };
     threads_.push_back(new std::thread(producer));

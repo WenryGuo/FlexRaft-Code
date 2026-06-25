@@ -1,0 +1,30 @@
+# 忽略所有子项目下的 build 文件夹
+build/
+*/build/
+*/*/build/
+
+# 忽略 CMake 缓存和生成的中间目录
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# 忽略 C++ 编译生成的中间对象和库文件
+*.o
+*.a
+*.so
+*.out
+
+# 忽略 ISA-L 在宿主机生成的配置文件
+isa-l/configure
+isa-l/config.log
+isa-l/config.status
+isa-l/autom4te.cache/
+isa-l/.deps/
+isa-l/.libs/
+
+# 忽略 Git 仓库信息 (减小体积)
+.git/
+
+# 忽略你的本地持久化数据目录 (极其重要，防止把日志打进镜像)
+data/

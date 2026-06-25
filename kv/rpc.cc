@@ -15,10 +15,18 @@ namespace rpc {
 
 Response KvServerRPCClient::DealWithRequest(const Request &request) {
   try {
-    auto resp = client_stub_.DealWithRequest(request);
+    auto resp = NextClient().DealWithRequest(request);
     return resp;
   } catch (RCF::Exception &e) {
-    LOG(raft::util::kRaft, "KvServerRPC Client %d RCP failed(%s)", id_,
+    // #region agent log
+    int current_count = 0;
+    static std::atomic<int> error_count{0};
+    error_count.fetch_add(1, std::memory_order_relaxed);
+    fprintf(stderr, "[DEBUG-8de3d8] DealWithRequest EXCEPTION client_id=%d error='%s' total_errors=%d\n",
+            id_, e.getErrorMessage().c_str(), (int)error_count.load());
+    fflush(stderr);
+    // #endregion
+    fprintf(stderr, "KvServerRPC Client %d RCP failed(%s)\n", id_,
         e.getErrorMessage().c_str());
     Response resp;
     resp.err = kRPCCallFailed;
@@ -29,7 +37,7 @@ Response KvServerRPCClient::DealWithRequest(const Request &request) {
 // Synchronize call GetValue
 GetValueResponse KvServerRPCClient::GetValue(const GetValueRequest &request) {
   try {
-    auto resp = client_stub_.GetValue(request);
+    auto resp = NextClient().GetValue(request);
     return resp;
   } catch (RCF::Exception &e) {
     LOG(raft::util::kRaft, "KvServerRPC Client %d RCP failed(%s)", id_,
@@ -43,13 +51,13 @@ GetValueResponse KvServerRPCClient::GetValue(const GetValueRequest &request) {
 // Asynchronous call GetValue
 void KvServerRPCClient::GetValue(const GetValueRequest &request,
                                  std::function<void(const GetValueResponse &)> cb) {
-  ClientPtr client_ptr(
-      new RcfClient<I_KvServerRPCService>(RCF::TcpEndpoint(address_.ip, address_.port)));
+  auto client_ptr = std::make_shared<RcfClient<I_KvServerRPCService>>(
+      RCF::TcpEndpoint(address_.ip, address_.port));
   client_ptr->getClientStub().getTransport().setMaxOutgoingMessageLength(512 * 1024 * 1024);
   client_ptr->getClientStub().setRemoteCallTimeoutMs(900);
 
   RCF::Future<GetValueResponse> ret;
-  auto cmp_callback = [=]() { onGetValueComplete(ret, cb); };
+  auto cmp_callback = [=, this]() { onGetValueComplete(ret, cb); };
   ret = client_ptr->GetValue(RCF::AsyncTwoway(cmp_callback), request);
   LOG(raft::util::kRaft, "KvServerRPCClient::GetValue request sent");
 }

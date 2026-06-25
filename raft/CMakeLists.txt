@@ -28,20 +28,32 @@ endif()
 SET(LIBS ${libpthread} ${libdl} ${libuuid} ${libisal})
 
 set(
-  RAFT_SRC 
-  log_entry.cc 
+  RAFT_SRC
+  log_entry.cc
   serializer.cc
   encoder.cc
   util.cc
   log_manager.cc
   storage.cc
+  persist_queue.cc
   rcf_rpc.cc
   raft.cc
   raft_node.cc
+  raft_unified_rpc_server.cc
+  batch_transport.cc
+  batch_rpc_sender.cc
+  batch_system_bridge.cc
+  stripe_hooks.cc
 )
 
+# NOTE: raft_batch_transport_stub.cc was removed as it is unused
+# The real implementation is in batch_rpc_sender.cc
+
 add_library(raft ${RAFT_SRC})
-target_include_directories(raft PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(raft 
+    PUBLIC ${CMAKE_CURRENT_LIST_DIR}
+    PUBLIC ${CMAKE_SOURCE_DIR}/multi-raft
+)
 target_link_libraries(raft rcf ${LIBS})
 # target_compile_definitions(raft PRIVATE ENABLE_RAFT_LOG="${ENABLE_RAFT_LOG}")
 

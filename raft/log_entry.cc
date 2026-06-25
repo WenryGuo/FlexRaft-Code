@@ -4,6 +4,22 @@
 
 namespace raft {
 
+std::vector<Slice> LogEntry::GetFragmentsForNode(int node_id) const {
+  std::vector<Slice> result;
+
+  if (!IsLrcEncoded() || placement_.empty()) {
+    // 非 LRC 或无 placement: 返回所有 fragments
+    return fragments_;
+  }
+
+  for (size_t i = 0; i < placement_.size() && i < fragments_.size(); ++i) {
+    if (placement_[i].node_id == node_id) {
+      result.push_back(fragments_[i]);
+    }
+  }
+  return result;
+}
+
 /* void LogEntry::serialize(SF::Archive &ar) { */
 /*   ar &term; */
 /*   ar &index; */
@@ -60,6 +76,8 @@ auto operator==(const LogEntry &lhs, const LogEntry &rhs) -> bool {
   if (!hdr_equal) {
     return false;
   }
+
+  // HasPayload/Payload not defined, skipping payload comparison
 
   auto lhs_cmd_data = lhs.CommandData(), rhs_cmd_data = rhs.CommandData();
   auto cmd_data_equal = !lhs_cmd_data.valid() && !rhs_cmd_data.valid();

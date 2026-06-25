@@ -1,0 +1,96 @@
+networks:
+  flexraft_net:
+    driver: bridge
+
+# 用 x-node 定义公共配置模板，避免六个节点重复写
+x-node-common: &node-common
+  image: multi-rsraft:x86
+  build:
+    context: .
+    dockerfile: Dockerfile\ QUME_x86
+  networks:
+    - flexraft_net
+  volumes:
+    - ./conf:/app/conf:ro        # multi-raft-7-lrc.conf 只读挂载
+    - ./data:/app/data           # RocksDB 数据目录
+  restart: on-failure            # Raft 启动有竞争，允许重试
+
+services:
+  # ── Group 0 ──────────────────────────────────────────
+  node-0:
+    <<: *node-common
+    container_name: node-0
+    hostname: node-0
+    command: ["/flexraft/build/bench/bench_server_multiraft", "--conf", "/app/conf/multi-raft-7-lrc.conf", "--id", "0"]
+    ports:
+      - "51010:51010"   # raft_rpc
+      - "60010:60010"   # kv_rpc
+
+  node-1:
+    <<: *node-common
+    container_name: node-1
+    hostname: node-1
+    command: ["/flexraft/build/bench/bench_server_multiraft", "--conf", "/app/conf/multi-raft-7-lrc.conf", "--id", "1"]
+    ports:
+      - "51011:51011"
+      - "60011:60011"
+
+  node-2:
+    <<: *node-common
+    container_name: node-2
+    hostname: node-2
+    command: ["/flexraft/build/bench/bench_server_multiraft", "--conf", "/app/conf/multi-raft-7-lrc.conf", "--id", "2"]
+    ports:
+      - "51012:51012"
+      - "60012:60012"
+
+  # ── Group 1 ──────────────────────────────────────────
+  node-3:
+    <<: *node-common
+    container_name: node-3
+    hostname: node-3
+    command: ["/flexraft/build/bench/bench_server_multiraft", "--conf", "/app/conf/multi-raft-7-lrc.conf", "--id", "3"]
+    ports:
+      - "51013:51013"
+      - "60013:60013"
+
+  node-4:
+    <<: *node-common
+    container_name: node-4
+    hostname: node-4
+    command: ["/flexraft/build/bench/bench_server_multiraft", "--conf", "/app/conf/multi-raft-7-lrc.conf", "--id", "4"]
+    ports:
+      - "51014:51014"
+      - "60014:60014"
+
+  node-5:
+    <<: *node-common
+    container_name: node-5
+    hostname: node-5
+    command: ["/flexraft/build/bench/bench_server_multiraft", "--conf", "/app/conf/multi-raft-7-lrc.conf", "--id", "5"]
+    ports:
+      - "51015:51015"
+      - "60015:60015"
+
+  node-6:
+    <<: *node-common
+    container_name: node-6
+    hostname: node-6
+    command: ["/flexraft/build/bench/bench_server_multiraft", "--conf", "/app/conf/multi-raft-7-lrc.conf", "--id", "6"]
+    ports:
+      - "51016:51016"
+      - "60016:60016"
+
+  # ── 客户端容器 ─────────────────────────────────────────
+  client:
+    <<: *node-common
+    container_name: flexraft-client
+    hostname: flexraft-client
+    # 客户端只需要挂载配置，不需要数据目录
+    volumes:
+      - ./conf:/app/conf:ro
+    profiles:
+      - client   # 用 docker compose --profile client up 来单独启动
+    stdin_open: true
+    tty: true
+    command: ["bash"]

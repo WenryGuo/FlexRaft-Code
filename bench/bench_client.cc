@@ -90,7 +90,7 @@ void ExecuteBench(kv::KvServiceClient *client, const std::vector<KvPair> &bench)
   for (int i = 0; i < bench.size(); ++i) {
     const auto &p = bench[i];
     auto start = raft::util::NowTime();
-    auto stat = client->Put(p.first, p.second);
+    auto stat = client->RoutePut(p.first, p.second);
     auto dura = raft::util::DurationToMicros(start, raft::util::NowTime());
     if (stat.err == kv::kOk) {
       op_stats.push_back(OperationStat{static_cast<uint64_t>(dura), stat.commit_elapse_time,
@@ -121,7 +121,7 @@ void ExecuteBench(kv::KvServiceClient *client, const std::vector<KvPair> &bench)
   // Check if inserted value can be found
   for (const auto &p : bench) {
     std::string get_val;
-    auto stat = client->Get(p.first, &get_val);
+    auto stat = client->RouteGet(p.first, &get_val);
     if (stat.err == kv::kOk && get_val == p.second) {
       ++succ_cnt;
     }

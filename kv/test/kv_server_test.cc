@@ -88,13 +88,13 @@ public:
 
 public:
   ErrorType Put(const std::string &key, const std::string &value) {
-    Request request = Request{kPut, 0, 0, key, value};
+    Request request = Request{kPut, 0, 0, raft::raft_group_id_t(0), key, value};
     Response resp;
     return WaitUntilRequestDone(&request, &resp);
   }
 
   ErrorType Get(const std::string &key, std::string *value) {
-    Request request = Request{kGet, 0, 0, key, std::string("")};
+    Request request = Request{kGet, 0, 0, raft::raft_group_id_t(0), key, std::string("")};
     Response resp;
     auto res = WaitUntilRequestDone(&request, &resp);
 
@@ -147,7 +147,7 @@ public:
   }
 
   ErrorType Delete(const std::string &key) {
-    Request request = Request{kDelete, 0, 0, key, std::string("")};
+    Request request = Request{kDelete, 0, 0, raft::raft_group_id_t(0), key, std::string("")};
     Response resp;
     return WaitUntilRequestDone(&request, &resp);
   }
@@ -155,7 +155,7 @@ public:
   raft::raft_node_id_t DetectLeader() {
     for (int i = 0; i < node_num_; ++i) {
       if (Alive(i)) {
-        auto req = Request{kDetectLeader, 0, 0, "", ""};
+        auto req = Request{kDetectLeader, 0, 0, raft::raft_group_id_t(0), "", ""};
         Response resp;
         servers_[i]->DealWithRequest(&req, &resp);
         if (resp.err == kOk) {

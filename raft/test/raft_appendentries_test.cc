@@ -116,7 +116,7 @@ static std::vector<LogEntry> ConstructLogEntry(const StorageMock::Logs& entry) {
 void RaftAppendEntriesTest::RunSingleTest(const TestCase& test) {
   auto storage = StorageMock::BuildStorage(test.init_state.entries);
   // This test does not require rpc client since it's passive
-  auto config = RaftConfig{1, {}, storage};
+  auto config = RaftConfig{.id = 1, .group_id = 0, .rpc_clients = {}, .storage = storage};
 
   auto raft_state = RaftState::NewRaftState(config);
   raft_state->SetCurrentTerm(test.init_state.raft_term);
@@ -157,7 +157,7 @@ class RaftHandleAppendEntriesReplyTest : public ::testing::Test {
 void RaftHandleAppendEntriesReplyTest::RunSingleTest(const TestCase& test) {
   auto storage = StorageMock::BuildStorage(test.init_state.entries);
   // This test does not require rpc client since it's passive
-  auto config = RaftConfig{1, {{1, nullptr}, {2, nullptr}, {3, nullptr}}, storage};
+  auto config = RaftConfig{.id = 1, .group_id = 0, .rpc_clients = {{1, nullptr}, {2, nullptr}, {3, nullptr}}, .storage = storage};
 
   auto raft_state = RaftState::NewRaftState(config);
   raft_state->SetCurrentTerm(test.init_state.raft_term);
@@ -179,7 +179,7 @@ TEST_F(RaftAppendEntriesTest, TestAppendEntriesTerm) {
       // Expect Result: Refuse to accepect this AppendEntries call and remain old state
       TestCase{
           TestRaftState{2, kFollower, 0, {}},
-          AppendEntriesArgs{1, 2, 0, 0, 0, 1, 0, ConstructLogEntry({{1, 1}})},
+          AppendEntriesArgs{1, 0, 2, 0, 0, 0, 1, 0, ConstructLogEntry({{1, 1}})},
           TestRaftState{2, kFollower, 0, {}},
           AppendEntriesReply{2, false, 0, 1},
       },
@@ -189,7 +189,7 @@ TEST_F(RaftAppendEntriesTest, TestAppendEntriesTerm) {
       // Expect Result: Accept this Heartbeat message and converts to at Term 2
       TestCase{
           TestRaftState{0, kFollower, 0, {}},
-          AppendEntriesArgs{1, 2, 0, 0, 0, 0, 0, {}},
+          AppendEntriesArgs{1, 0, 2, 0, 0, 0, 0, 0, {}},
           TestRaftState{1, kFollower, 0, {}},
           AppendEntriesReply{1, true, 1, 1},
       },
@@ -198,7 +198,7 @@ TEST_F(RaftAppendEntriesTest, TestAppendEntriesTerm) {
       // Expect Result: Accpect this AppendEntriesArgs and accept this log entry
       TestCase{
           TestRaftState{1, kFollower, 0, {}},
-          AppendEntriesArgs{1, 2, 0, 0, 0, 1, 0, ConstructLogEntry({{1, 1}})},
+          AppendEntriesArgs{1, 0, 2, 0, 0, 0, 1, 0, ConstructLogEntry({{1, 1}})},
           TestRaftState{1, kFollower, 0, {{1, 1}}},
           AppendEntriesReply{1, true, 2, 1},
       },
@@ -210,20 +210,20 @@ TEST_F(RaftAppendEntriesTest, TestConvertToFollowerOnReceivingAppendEntries) {
   std::vector<TestCase> tests = {
       TestCase{
           TestRaftState{1, kCandidate, 0, {{1, 1}, {1, 2}}},
-          AppendEntriesArgs{1, 2, 2, 1, 0, 0, 0, ConstructLogEntry({})},
+          AppendEntriesArgs{1, 0, 2, 2, 1, 0, 0, 0, ConstructLogEntry({})},
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}}},
           AppendEntriesReply{1, true, 3, 1},
       },
       TestCase{
           TestRaftState{1, kCandidate, 0, {{1, 1}, {1, 2}}},
-          AppendEntriesArgs{1, 2, 2, 1, 0, 3, 0,
+          AppendEntriesArgs{1, 0, 2, 2, 1, 0, 3, 0,
                             ConstructLogEntry({{1, 3}, {2, 4}, {3, 5}})},
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}, {1, 3}, {2, 4}, {3, 5}}},
           AppendEntriesReply{1, true, 6, 1},
       },
       TestCase{
           TestRaftState{1, kLeader, 0, {{1, 1}, {2, 2}, {3, 3}, {4, 4}}},
-          AppendEntriesArgs{2, 2, 1, 1, 0, 2, 0, ConstructLogEntry({{3, 2}, {4, 3}})},
+          AppendEntriesArgs{2, 0, 2, 1, 1, 0, 2, 0, ConstructLogEntry({{3, 2}, {4, 3}})},
           TestRaftState{2, kFollower, 0, {{1, 1}, {3, 2}, {4, 3}}},
           AppendEntriesReply{2, true, 4, 1},
       },
@@ -239,7 +239,7 @@ TEST_F(RaftAppendEntriesTest, TestSimplyAppendEntries) {
       // Expect Result: Accpect all log entries and has totally 5 log entries
       TestCase{
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}}},
-          AppendEntriesArgs{1, 2, 2, 1, 0, 3, 0,
+          AppendEntriesArgs{1, 0, 2, 2, 1, 0, 3, 0,
                             ConstructLogEntry({{1, 3}, {2, 4}, {3, 5}})},
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}, {1, 3}, {2, 4}, {3, 5}}},
           AppendEntriesReply{1, true, 6, 1},
@@ -249,7 +249,7 @@ TEST_F(RaftAppendEntriesTest, TestSimplyAppendEntries) {
       // Expect Result: Accpect all log entries and has totally 5 log entries
       TestCase{
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}}},
-          AppendEntriesArgs{1, 2, 1, 1, 0, 3, 0,
+          AppendEntriesArgs{1, 0, 2, 1, 1, 0, 3, 0,
                             ConstructLogEntry({{1, 2}, {2, 3}, {3, 4}})},
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}, {2, 3}, {3, 4}}},
           AppendEntriesReply{1, true, 5, 1},
@@ -267,7 +267,7 @@ TEST_F(RaftAppendEntriesTest, TestDetectMismatchPrevLogEntry) {
       // Expect Result: refuse since there is no entry at (2, 3)
       TestCase{
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}}},
-          AppendEntriesArgs{1, 2, 3, 2, 0, 3, 0,
+          AppendEntriesArgs{1, 0, 2, 3, 2, 0, 3, 0,
                             ConstructLogEntry({{2, 4}, {2, 5}, {3, 6}})},
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}}},
           AppendEntriesReply{1, false, 1, 1},
@@ -277,7 +277,7 @@ TEST_F(RaftAppendEntriesTest, TestDetectMismatchPrevLogEntry) {
       // Expect Result: refuse since prev log entry mismatches, index 2 has term 1
       TestCase{
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}}},
-          AppendEntriesArgs{1, 2, 2, 2, 0, 3, 0,
+          AppendEntriesArgs{1, 0, 2, 2, 2, 0, 3, 0,
                             ConstructLogEntry({{2, 3}, {2, 4}, {3, 5}})},
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}}},
           AppendEntriesReply{1, false, 1, 1},
@@ -295,7 +295,7 @@ TEST_F(RaftAppendEntriesTest, TestDetectConflictLogEntries) {
       // append (2, 2) to receive server's log
       TestCase{
           TestRaftState{1, kFollower, 0, {{1, 1}, {1, 2}, {2, 3}}},
-          AppendEntriesArgs{1, 2, 1, 1, 0, 3, 0,
+          AppendEntriesArgs{1, 0, 2, 1, 1, 0, 3, 0,
                             ConstructLogEntry({{2, 2}, {3, 3}, {4, 4}})},
           TestRaftState{1, kFollower, 0, {{1, 1}, {2, 2}, {3, 3}, {4, 4}}},
           AppendEntriesReply{1, true, 5, 1},
@@ -307,7 +307,7 @@ TEST_F(RaftAppendEntriesTest, TestDetectConflictLogEntries) {
       // following logs even its log is newer than the leader
       TestCase{
           TestRaftState{1, kFollower, 0, {{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}}},
-          AppendEntriesArgs{1, 2, 2, 2, 0, 2, 0, ConstructLogEntry({{2, 3}, {3, 4}})},
+          AppendEntriesArgs{1, 0, 2, 2, 2, 0, 2, 0, ConstructLogEntry({{2, 3}, {3, 4}})},
           TestRaftState{1, kFollower, 0, {{1, 1}, {2, 2}, {2, 3}, {3, 4}}},
           AppendEntriesReply{1, true, 5, 1},
       },
@@ -320,7 +320,7 @@ TEST_F(RaftAppendEntriesTest, TestDropMessagesIfTermIsLower) {
   std::vector<TestCase> tests = {
       TestCase{
           TestRaftState{4, kFollower, 0, {{1, 1}, {2, 2}, {3, 3}, {4, 4}}},
-          AppendEntriesArgs{3, 2, 1, 1, 0, 3, 0, ConstructLogEntry({{3, 2}, {3, 3}})},
+          AppendEntriesArgs{3, 0, 2, 1, 1, 0, 3, 0, ConstructLogEntry({{3, 2}, {3, 3}})},
           TestRaftState{4, kFollower, 0, {{1, 1}, {2, 2}, {3, 3}, {4, 4}}},
           AppendEntriesReply{4, false, 0, 1},
       },
@@ -335,7 +335,7 @@ TEST_F(RaftAppendEntriesTest, TestFollowerUpdateCommitIndex) {
       // Expect Result: commit index should be 2
       TestCase{
           TestRaftState{1, kFollower, 0, {{1, 1}, {2, 2}}},
-          AppendEntriesArgs{1, 2, 2, 2, 2, 0, 0, ConstructLogEntry({})},
+          AppendEntriesArgs{1, 0, 2, 2, 2, 2, 0, 0, ConstructLogEntry({})},
           TestRaftState{1, kFollower, 2, {{1, 1}, {2, 2}}},
           AppendEntriesReply{1, true, 3, 1},
       },
@@ -346,7 +346,7 @@ TEST_F(RaftAppendEntriesTest, TestFollowerUpdateCommitIndex) {
       //  follower can only set commit index to be 1
       TestCase{
           TestRaftState{1, kFollower, 0, {{1, 1}, {2, 2}}},
-          AppendEntriesArgs{1, 2, 1, 1, 3, 0, 0, ConstructLogEntry({})},
+          AppendEntriesArgs{1, 0, 2, 1, 1, 3, 0, 0, ConstructLogEntry({})},
           TestRaftState{1, kFollower, 1, {{1, 1}, {2, 2}}},
           AppendEntriesReply{1, true, 2, 1},
       },
@@ -358,7 +358,7 @@ TEST_F(RaftAppendEntriesTest, TestFollowerUpdateCommitIndex) {
       //  1), (3, 2), so the commit index should be min(leader_commit, 2) = 2
       TestCase{
           TestRaftState{1, kFollower, 0, {{1, 1}, {2, 2}}},
-          AppendEntriesArgs{1, 2, 1, 1, 3, 1, 0, ConstructLogEntry({{3, 2}})},
+          AppendEntriesArgs{1, 0, 2, 1, 1, 3, 1, 0, ConstructLogEntry({{3, 2}})},
           TestRaftState{1, kFollower, 2, {{1, 1}, {3, 2}}},
           AppendEntriesReply{1, true, 3, 1},
       },

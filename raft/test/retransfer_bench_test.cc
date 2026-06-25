@@ -71,7 +71,7 @@ void RunRaftFollower(raft_node_id_t id, const NodesConfig &config) {
   auto storage = FileStorage::Open(filename);
 
   // Construct and initialize a raft state
-  auto raft_config = RaftConfig{id, {}, storage, 10000, 10000, nullptr};
+  auto raft_config = RaftConfig{.id = id, .group_id = 0, .rpc_clients = {}, .storage = storage, .electionTimeMin = 10000, .electionTimeMax = 10000, .rsm = nullptr};
   auto raft_stat = RaftState::NewRaftState(raft_config);
   raft_stat->SetRole(kFollower);
   raft_stat->SetCurrentTerm(1);
@@ -99,7 +99,7 @@ std::shared_ptr<RaftState> ConstructRaftLeader(raft_node_id_t id,
 
   std::shared_ptr<RaftState> ret;
   auto raft_config =
-      RaftConfig{id, rpc_clients, storage, 10000, 10000, nullptr};
+      RaftConfig{.id = id, .group_id = 0, .rpc_clients = rpc_clients, .storage = storage, .electionTimeMin = 10000, .electionTimeMax = 10000, .rsm = nullptr};
   ret.reset(RaftState::NewRaftState(raft_config));
   ret->convertToLeader();
   ret->SetCurrentTerm(1);

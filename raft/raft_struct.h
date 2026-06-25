@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <vector>
 
 #include "log_entry.h"
@@ -13,6 +14,11 @@ struct RequestVoteArgs {
   raft_index_t last_log_index;
 
   raft_term_t last_log_term;
+
+  raft_group_id_t group_id = 0;
+
+  // Candidate's priority (higher = better). Included in RequestVote for logging.
+  int candidate_priority;
 };
 
 struct RequestVoteReply {
@@ -21,11 +27,18 @@ struct RequestVoteReply {
   int vote_granted;
 
   raft_node_id_t reply_id;
+
+  // group_id is used to route the reply to the correct RaftState in multi-raft
+  raft_group_id_t group_id = 0;
 };
 
 struct AppendEntriesArgs {
   // Leader's term when sending this AppendEntries RPC.
   raft_term_t term;
+
+  // group_id is used by RaftUnifiedRPCService to route to the right RaftState.
+  // Placed immediately after term so it is covered by kAppendEntriesArgsHdrSize=36.
+  raft_group_id_t group_id = 0;
 
   // The leader's identifier
   raft_node_id_t leader_id;
@@ -57,6 +70,9 @@ struct AppendEntriesReply {
   // The raft node id of the server that makes this reply
   raft_node_id_t reply_id;
 
+  // group_id is used to route the reply to the correct RaftState in multi-raft
+  raft_group_id_t group_id = 0;
+
   uint32_t padding;
 
   int chunk_info_cnt;
@@ -64,6 +80,9 @@ struct AppendEntriesReply {
 };
 
 struct RequestFragmentsArgs {
+  // group_id is used by RaftUnifiedRPCService to route to the right RaftState
+  raft_group_id_t group_id;
+
   // The term when leader(Or pre-leader) sends out this RequestFragments RPC to
   // collect fragments in order to recover the original entry contents
   raft_term_t term;
@@ -102,14 +121,52 @@ struct CommandData {
 };
 
 enum {
-  // kAppendEntriesArgsHdrSize = sizeof(raft_term_t) * 2 + sizeof(raft_index_t)
-  // * 2 +
-  // sizeof(uint64_t) * 2 + sizeof(raft_node_id_t)
-  kAppendEntriesArgsHdrSize = 32,
-  kAppendEntriesReplyHdrSize = sizeof(raft_term_t) + sizeof(int) + sizeof(uint32_t) +
-                               sizeof(raft_node_id_t) + sizeof(raft_index_t) + sizeof(int),
+  // kAppendEntriesArgsHdrSize = sizeof(AppendEntriesArgs header fields, with padding)
+  // = sizeof(term) + sizeof(group_id) + sizeof(leader_id) + sizeof(prev_log_index)
+  //   + sizeof(prev_log_term) + sizeof(prev_k) + sizeof(leader_commit) + sizeof(entry_cnt)
+  // = 4+4+4+4+4+4+4+8 = 36, but struct pads to 40 (leader_commit[4] + entry_cnt[8] -> 8-align)
+  kAppendEntriesArgsHdrSize = 40,
+  kAppendEntriesReplyHdrSize = sizeof(raft_term_t) + sizeof(int) + sizeof(raft_index_t) +
+                               sizeof(raft_node_id_t) + sizeof(raft_group_id_t) +
+                               sizeof(uint32_t) + sizeof(int),
   kRequestFragmentsReplyHdrSize =
       sizeof(raft_node_id_t) + sizeof(raft_term_t) + sizeof(raft_index_t) + sizeof(int) * 2,
+};
+
+// ========================================================================
+// Multi-Raft Group Notification Structures
+// ========================================================================
+
+// 分组成员信息
+struct GroupMemberInfo {
+  raft_node_id_t node_id;
+  std::string raft_rpc_addr;   // 格式: "ip:port"
+  std::string kv_rpc_addr;     // 格式: "ip:port"
+  std::string raft_log_filename;
+  std::string kv_dbname;
+};
+
+// 分组信息
+struct GroupInfo {
+  raft_group_id_t group_id;
+  int initiator_id;
+  int initiator_generated_index;
+  int complementary_group_count;
+  std::vector<raft_group_id_t> complementary_group_indices;
+  std::vector<GroupMemberInfo> members;
+};
+
+// 分组通知参数（用于 RPC 通知）
+struct GroupNotificationArgs {
+  raft_node_id_t source_node_id;
+  int total_groups;
+  std::vector<GroupInfo> groups;
+};
+
+// 分组通知响应
+struct GroupNotificationReply {
+  int success;
+  raft_node_id_t reply_node_id;
 };
 
 }  // namespace raft

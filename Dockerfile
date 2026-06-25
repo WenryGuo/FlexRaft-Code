@@ -104,7 +104,6 @@ COPY . .
 RUN rm -rf build &&\
     cmake -B build \
     -DCMAKE_SYSTEM_NAME=Linux \
-    -DREPLICATION_MODE=FULL \
     -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
     -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
     -DCMAKE_PREFIX_PATH=/usr/aarch64-linux-gnu && \

@@ -1,0 +1,14 @@
+set pagination off
+set confirm off
+handle SIGSEGV pass noprint
+handle SIGABRT pass noprint
+
+# Run the program
+run --conf ./conf/multi-raft-7-localtest.conf --id 0 --peer_threads 14 --apply_threads 14 --batch_size 32 --encoding=LRC
+
+# When crashed, print backtrace
+echo "===== BACKTRACE =====" > /tmp/gdb_bt.txt
+bt full >> /tmp/gdb_bt.txt 2>&1
+thread apply all bt >> /tmp/gdb_bt.txt 2>&1
+echo "===== BACKTRACE END =====" >> /tmp/gdb_bt.txt
+quit

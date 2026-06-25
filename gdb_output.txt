@@ -1,0 +1,1570 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7ffff77ff640 (LWP 102648)]
+[KV-RPC-SERVER-0] RPC init (ip=127.0.0.1 port=60010)
+[New Thread 0x7ffff6ffe640 (LWP 102649)]
+[New Thread 0x7ffff67fd640 (LWP 102650)]
+
+========================================
+   YCSB Multi-Raft Server
+   7-Phase Startup
+========================================
+Node ID: 0
+Config: ./conf/multi-raft-7-localtest.conf
+========================================
+
+################################################################
+#  PHASE 1: Parsing Configuration File
+################################################################
+[PHASE-1] Config parsed successfully
+[PHASE-1] Cluster size: 7 nodes
+################################################################
+
+################################################################
+#  PHASE 2: Creating Unified Raft RPC Server
+################################################################
+[PHASE-2] My raft address: 127.0.0.1:51010
+[PHASE-2] My KV address: 127.0.0.1:60010
+################################################################
+
+################################################################
+#  PHASE 3: Establishing Connection Pool to All Peers
+################################################################
+[PHASE-3] Connection pool established for 7 peers
+################################################################
+
+################################################################
+#  PHASE 4: Building Uniform Group Memberships
+################################################################
+[PHASE-4] Node 0: building 7 uniform groups (size 7 each)
+[PHASE-4] Node 0 has 7 uniform groups
+################################################################
+
+################################################################
+#  PHASE 5: Creating Raft Instances
+################################################################
+[REGISTRY-N0] Creating GroupRegistry (KV listen: 127.0.0.1:60010)
+[ROUTER-N0] RpcRouter created
+[REGISTRY-N0] GroupRegistry created (as RPC dispatcher)
+
+========================================
+[STORE-N0] RaftStore created (phase-based)
+[STORE-N0] Raft RPC: 127.0.0.1:51010
+[STORE-N0] KV RPC:   127.0.0.1:60010
+========================================
+
+[RAFT-UNIFIED-P0] Created unified RPC server at 127.0.0.1:51010
+[STORE-N0] Unified Raft RPC server created
+[RAFT-UNIFIED-P0] Server started successfully at 127.0.0.1:51010
+[PHASE-5] Raft RPC server started
+[STORE-N0] InitLatencyMatrix: N=7
+
+[LATENCY-MATRIX] N=7
+[LATENCY-MATRIX]         0    1    2    3    4    5    6
+[LATENCY-MATRIX]     ------------------------------------------
+[LATENCY-MATRIX]   0 |    0   58   77  289  191  258  224 | avg=182.8
+[LATENCY-MATRIX]   1 |   58    0  293   53  106  171  144 | avg=137.5
+[LATENCY-MATRIX]   2 |   77  293    0   38  210   50  209 | avg=146.2
+[LATENCY-MATRIX]   3 |  289   53   38    0   98   58  134 | avg=111.7
+[LATENCY-MATRIX]   4 |  191  106  210   98    0  133  239 | avg=162.8
+[LATENCY-MATRIX]   5 |  258  171   50   58  133    0  134 | avg=134.0
+[LATENCY-MATRIX]   6 |  224  144  209  134  239  134    0 | avg=180.7
+
+[LATENCY-MATRIX] Sorted neighbors by latency:
+[LATENCY-MATRIX] Node 0: (1,58.0) (2,77.0) (4,191.0) (6,224.0) (5,258.0) ... (+1 more)
+[LATENCY-MATRIX] Node 1: (3,53.0) (0,58.0) (4,106.0) (6,144.0) (5,171.0) ... (+1 more)
+[LATENCY-MATRIX] Node 2: (3,38.0) (5,50.0) (0,77.0) (6,209.0) (4,210.0) ... (+1 more)
+[LATENCY-MATRIX] Node 3: (2,38.0) (1,53.0) (5,58.0) (4,98.0) (6,134.0) ... (+1 more)
+[LATENCY-MATRIX] Node 4: (3,98.0) (1,106.0) (5,133.0) (0,191.0) (2,210.0) ... (+1 more)
+[LATENCY-MATRIX] Node 5: (2,50.0) (3,58.0) (4,133.0) (6,134.0) (1,171.0) ... (+1 more)
+[LATENCY-MATRIX] Node 6: (3,134.0) (5,134.0) (1,144.0) (2,209.0) (0,224.0) ... (+1 more)
+[STORE-N0] InitLatencyMatrix: done, N=7, seed=18581050327
+[STORE-N0] BuildLrcGroups: N=7
+[LRC-COMPL-GROUP] N=7, seed=18581050327, LRC(4,2,8) local_k=2 overhead=3.50x
+
+[LRC-COMPL-GROUP] ===== Multi-Anchor Greedy Clustering =====
+[LRC-COMPL-GROUP] N=7, l=2
+[LRC-PHASE1] Initial pair: (1, 2) with latency=293 ms
+[LRC-COMPL-GROUP] Phase 1: Anchors selected: {1 2 }
+[LRC-COMPL-GROUP] Phase 2: Round-robin assignment done
+[LRC-PHASE3] Iteration 1: improvements=0, no_improve=1
+[LRC-PHASE3] Iteration 2: improvements=0, no_improve=2
+[LRC-PHASE3] Iteration 3: improvements=0, no_improve=3
+[LRC-PHASE3] Iteration 4: improvements=0, no_improve=4
+[LRC-PHASE3] Iteration 5: improvements=0, no_improve=5
+[LRC-PHASE3] Iteration 6: improvements=0, no_improve=6
+[LRC-PHASE3] Iteration 7: improvements=0, no_improve=7
+[LRC-PHASE3] Iteration 8: improvements=0, no_improve=8
+[LRC-PHASE3] Iteration 9: improvements=0, no_improve=9
+[LRC-PHASE3] Iteration 10: improvements=0, no_improve=10
+[LRC-PHASE3] Optimization finished after 10 iterations
+[LRC-COMPL-GROUP] Phase 3: Swap optimization done
+[LRC-COMPL-GROUP] BuildNodeToFragmentsMapping: all 7 nodes have exactly 2 fragments
+
+[LRC-COMPL-GROUP] ===== Verification =====
+[LRC-COMPL-GROUP] Verification complete: 7 nodes in 2 groups
+
+[LRC-COMPL-GROUP] ===== Validating Placement Constraints =====
+[LRC-VALIDATE] All constraints satisfied!
+[LRC-COMPL-GROUP] ===== Validation Complete =====
+
+[LRC-COMPL-GROUP] ===== Multi-Anchor Clustering Done =====
+
+[LRC-COMPL-GROUP] ===== All Groups (l=2) =====
+[LRC-COMPL-GROUP] Group 0 (size=4): {1 3 4 6 }
+[LRC-COMPL-GROUP] Group 1 (size=3): {2 5 0 }
+
+[LRC-COMPL-GROUP] Group intra-latency:
+[LRC-COMPL-GROUP]   Group 0: avg=129.0 ms
+[LRC-COMPL-GROUP]   Group 1: avg=128.3 ms
+
+[LRC-COMPL-GROUP] ===== Node -> Fragments Mapping =====
+[LRC-COMPL-GROUP] Node 0: frags={5 12 }
+[LRC-COMPL-GROUP] Node 1: frags={0 6 }
+[LRC-COMPL-GROUP] Node 2: frags={2 10 }
+[LRC-COMPL-GROUP] Node 3: frags={1 7 }
+[LRC-COMPL-GROUP] Node 4: frags={8 13 }
+[LRC-COMPL-GROUP] Node 5: frags={3 11 }
+[LRC-COMPL-GROUP] Node 6: frags={4 9 }
+[STORE-N0] BuildLrcGroups: done, latency_aware_enabled=1
+[REGISTRY-N0] encoding mode = LRC (WRITE-IN logs use this)
+[STORE-N0] Encoding mode set to LRC
+[PHASE-5] encoding mode: LRC
+
+[STORE-N0] Creating 7 Raft instances...
+[ASYNC-SENDER] Created pool (4 conns) to node 1 at 127.0.0.1:51011
+[ASYNC-SENDER] Created pool (4 conns) to node 2 at 127.0.0.1:51012
+[ASYNC-SENDER] Created pool (4 conns) to node 3 at 127.0.0.1:51013
+[ASYNC-SENDER] Created pool (4 conns) to node 4 at 127.0.0.1:51014
+[ASYNC-SENDER] Created pool (4 conns) to node 5 at 127.0.0.1:51015
+[ASYNC-SENDER] Created pool (4 conns) to node 6 at 127.0.0.1:51016
+[ASYNC-MANAGER] Initialized for node 0 with 7 peers (async mode)
+[PHASE-5] Inspecting membership: group=0 local_id=0 cluster_cfg={6 5 4 3 2 1 0 }
+[New Thread 0x7ffff4ff6640 (LWP 102651)]
+[New Thread 0x7fffe7fff640 (LWP 102652)]
+[New Thread 0x7fffe77fe640 (LWP 102653)]
+[New Thread 0x7fffe6ffd640 (LWP 102654)]
+[Thread 0x7fffe77fe640 (LWP 102653) exited]
+[New Thread 0x7fffe67fc640 (LWP 102655)]
+[Thread 0x7fffe6ffd640 (LWP 102654) exited]
+[New Thread 0x7fffe5ffb640 (LWP 102656)]
+[Thread 0x7fffe67fc640 (LWP 102655) exited]
+[New Thread 0x7fffe57fa640 (LWP 102657)]
+[Thread 0x7fffe5ffb640 (LWP 102656) exited]
+[New Thread 0x7fffe4ff9640 (LWP 102658)]
+[Thread 0x7fffe57fa640 (LWP 102657) exited]
+[New Thread 0x7fffdbfff640 (LWP 102659)]
+[Thread 0x7fffe4ff9640 (LWP 102658) exited]
+[New Thread 0x7fffdb7fe640 (LWP 102660)]
+[Thread 0x7fffdbfff640 (LWP 102659) exited]
+[New Thread 0x7fffdaffd640 (LWP 102661)]
+[Thread 0x7fffdb7fe640 (LWP 102660) exited]
+[New Thread 0x7fffda7fc640 (LWP 102662)]
+[Thread 0x7fffdaffd640 (LWP 102661) exited]
+[New Thread 0x7fffd9ffb640 (LWP 102663)]
+[Thread 0x7fffda7fc640 (LWP 102662) exited]
+[New Thread 0x7fffd97fa640 (LWP 102664)]
+[Thread 0x7fffd9ffb640 (LWP 102663) exited]
+[New Thread 0x7fffd8ff9640 (LWP 102665)]
+[Thread 0x7fffd97fa640 (LWP 102664) exited]
+[New Thread 0x7fffd3fff640 (LWP 102666)]
+[Thread 0x7fffd8ff9640 (LWP 102665) exited]
+[New Thread 0x7fffd37fe640 (LWP 102667)]
+[Thread 0x7fffd3fff640 (LWP 102666) exited]
+[Thread 0x7fffd37fe640 (LWP 102667) exited]
+[New Thread 0x7fffd37fe640 (LWP 102668)]
+[REGISTRY-N0] Registered local KvServiceNode: group=0 (keyed for RPC routing)
+[REGISTRY-N0] Registered KvServiceNode: group=0 local_id=0
+[STORE-N0] Creating RaftNode for group=0 local_id=0...
+[RAFT-NODE-N0] BatchSystemBridge created for group=0
+[STORE-N0] Created RaftNode for group=0 local_id=0 (addr=127.0.0.1:51010)
+[STORE-N0] Creating ApplyFsm for group=0...
+[DEBUG-APPLY-FSM] CTOR: kv_node=0x5555560b36c0 group=0 node=0 enc=2 n=7
+[BATCH-N0] Registered ApplyFsm, total applies=1
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=0
+[BATCH-N0] Registered ApplyFsm, total applies=1
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=0
+[STORE-N0] Creating PeerFsm for group=0...
+[PEER-G0-N0] PeerFsm created
+[PEER-G0-N0] RaftNode initialized at 0x5555560c9480
+[BATCH-N0] Registered PeerFsm, total peers=1
+[ROUTER-N0] Registered PeerFsm: group=0 node=0
+[ROUTER-N0] Registered PeerFsm Mailbox: group=0 node=0 mb=0x555556110ec8
+[ROUTER-N0] Total registered peers: 1 groups: 1
+[STORE-N0] Created Raft instance: group=0 local_id=0
+[PHASE-5] Inspecting membership: group=1 local_id=0 cluster_cfg={6 5 4 3 2 1 0 }
+[New Thread 0x7fffd3fff640 (LWP 102669)]
+[New Thread 0x7fffd8ff9640 (LWP 102670)]
+[Thread 0x7fffd3fff640 (LWP 102669) exited]
+[New Thread 0x7fffd97fa640 (LWP 102671)]
+[Thread 0x7fffd8ff9640 (LWP 102670) exited]
+[New Thread 0x7fffe67f8640 (LWP 102672)]
+[Thread 0x7fffd97fa640 (LWP 102671) exited]
+[New Thread 0x7fffe5ff7640 (LWP 102673)]
+[Thread 0x7fffe67f8640 (LWP 102672) exited]
+[New Thread 0x7fffe57f6640 (LWP 102674)]
+[Thread 0x7fffe5ff7640 (LWP 102673) exited]
+[New Thread 0x7fffe4ff5640 (LWP 102675)]
+[Thread 0x7fffe57f6640 (LWP 102674) exited]
+[New Thread 0x7fffdbfff640 (LWP 102676)]
+[Thread 0x7fffe4ff5640 (LWP 102675) exited]
+[New Thread 0x7fffdb7fe640 (LWP 102677)]
+[Thread 0x7fffdbfff640 (LWP 102676) exited]
+[New Thread 0x7fffdaffd640 (LWP 102678)]
+[Thread 0x7fffdb7fe640 (LWP 102677) exited]
+[New Thread 0x7fffda7fc640 (LWP 102679)]
+[Thread 0x7fffdaffd640 (LWP 102678) exited]
+[Thread 0x7fffda7fc640 (LWP 102679) exited]
+[New Thread 0x7fffd9ffb640 (LWP 102680)]
+[New Thread 0x7fffd2ffd640 (LWP 102681)]
+[Thread 0x7fffd9ffb640 (LWP 102680) exited]
+[New Thread 0x7fffd27fc640 (LWP 102682)]
+[Thread 0x7fffd2ffd640 (LWP 102681) exited]
+[New Thread 0x7fffd1ffb640 (LWP 102683)]
+[Thread 0x7fffd27fc640 (LWP 102682) exited]
+[Thread 0x7fffd1ffb640 (LWP 102683) exited]
+[REGISTRY-N0] Registered local KvServiceNode: group=1 (keyed for RPC routing)
+[REGISTRY-N0] Registered KvServiceNode: group=1 local_id=0
+[STORE-N0] Creating RaftNode for group=1 local_id=0...
+[RAFT-NODE-N0] BatchSystemBridge created for group=1
+[STORE-N0] Created RaftNode for group=1 local_id=0 (addr=127.0.0.1:51010)
+[STORE-N0] Creating ApplyFsm for group=1...
+[DEBUG-APPLY-FSM] CTOR: kv_node=0x5555560c6770 group=1 node=0 enc=2 n=7
+[BATCH-N0] Registered ApplyFsm, total applies=2
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=1
+[BATCH-N0] Registered ApplyFsm, total applies=2
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=1
+[STORE-N0] Creating PeerFsm for group=1...
+[PEER-G1-N0] PeerFsm created
+[PEER-G1-N0] RaftNode initialized at 0x55555610da40
+[BATCH-N0] Registered PeerFsm, total peers=2
+[ROUTER-N0] Registered PeerFsm: group=1 node=0
+[ROUTER-N0] Registered PeerFsm Mailbox: group=1 node=0 mb=0x55555612c9e8
+[ROUTER-N0] Total registered peers: 2 groups: 2
+[STORE-N0] Created Raft instance: group=1 local_id=0
+[PHASE-5] Inspecting membership: group=2 local_id=0 cluster_cfg={6 5 4 3 2 1 0 }
+[New Thread 0x7fffd1ffb640 (LWP 102684)]
+[New Thread 0x7fffd27fc640 (LWP 102685)]
+[Thread 0x7fffd1ffb640 (LWP 102684) exited]
+[New Thread 0x7fffd2ffd640 (LWP 102686)]
+[Thread 0x7fffd27fc640 (LWP 102685) exited]
+[New Thread 0x7fffd9ffb640 (LWP 102687)]
+[Thread 0x7fffd2ffd640 (LWP 102686) exited]
+[New Thread 0x7fffe57f2640 (LWP 102688)]
+[Thread 0x7fffd9ffb640 (LWP 102687) exited]
+[New Thread 0x7fffe4ff1640 (LWP 102689)]
+[Thread 0x7fffe57f2640 (LWP 102688) exited]
+[Thread 0x7fffe4ff1640 (LWP 102689) exited]
+[New Thread 0x7fffdbfff640 (LWP 102690)]
+[New Thread 0x7fffdb7fe640 (LWP 102691)]
+[Thread 0x7fffdbfff640 (LWP 102690) exited]
+[New Thread 0x7fffdaffd640 (LWP 102692)]
+[Thread 0x7fffdb7fe640 (LWP 102691) exited]
+[New Thread 0x7fffda7fc640 (LWP 102693)]
+[Thread 0x7fffdaffd640 (LWP 102692) exited]
+[New Thread 0x7fffd97fa640 (LWP 102694)]
+[Thread 0x7fffda7fc640 (LWP 102693) exited]
+[New Thread 0x7fffd8ff9640 (LWP 102695)]
+[Thread 0x7fffd97fa640 (LWP 102694) exited]
+[New Thread 0x7fffd3fff640 (LWP 102696)]
+[Thread 0x7fffd8ff9640 (LWP 102695) exited]
+[New Thread 0x7fffd17fa640 (LWP 102697)]
+[Thread 0x7fffd3fff640 (LWP 102696) exited]
+[New Thread 0x7fffd0ff9640 (LWP 102698)]
+[Thread 0x7fffd17fa640 (LWP 102697) exited]
+[Thread 0x7fffd0ff9640 (LWP 102698) exited]
+[REGISTRY-N0] Registered local KvServiceNode: group=2 (keyed for RPC routing)
+[REGISTRY-N0] Registered KvServiceNode: group=2 local_id=0
+[STORE-N0] Creating RaftNode for group=2 local_id=0...
+[RAFT-NODE-N0] BatchSystemBridge created for group=2
+[STORE-N0] Created RaftNode for group=2 local_id=0 (addr=127.0.0.1:51010)
+[STORE-N0] Creating ApplyFsm for group=2...
+[DEBUG-APPLY-FSM] CTOR: kv_node=0x5555561ef110 group=2 node=0 enc=2 n=7
+[BATCH-N0] Registered ApplyFsm, total applies=3
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=2
+[BATCH-N0] Registered ApplyFsm, total applies=3
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=2
+[STORE-N0] Creating PeerFsm for group=2...
+[PEER-G2-N0] PeerFsm created
+[PEER-G2-N0] RaftNode initialized at 0x555556168b20
+[BATCH-N0] Registered PeerFsm, total peers=3
+[ROUTER-N0] Registered PeerFsm: group=2 node=0
+[ROUTER-N0] Registered PeerFsm Mailbox: group=2 node=0 mb=0x555556183128
+[ROUTER-N0] Total registered peers: 3 groups: 3
+[STORE-N0] Created Raft instance: group=2 local_id=0
+[PHASE-5] Inspecting membership: group=3 local_id=0 cluster_cfg={6 5 4 3 2 1 0 }
+[New Thread 0x7fffd0ff9640 (LWP 102699)]
+[New Thread 0x7fffd17fa640 (LWP 102700)]
+[Thread 0x7fffd0ff9640 (LWP 102699) exited]
+[New Thread 0x7fffd3fff640 (LWP 102701)]
+[Thread 0x7fffd17fa640 (LWP 102700) exited]
+[New Thread 0x7fffd8ff9640 (LWP 102702)]
+[Thread 0x7fffd3fff640 (LWP 102701) exited]
+[New Thread 0x7fffdbfff640 (LWP 102703)]
+[Thread 0x7fffd8ff9640 (LWP 102702) exited]
+[New Thread 0x7fffdb7fe640 (LWP 102704)]
+[Thread 0x7fffdbfff640 (LWP 102703) exited]
+[New Thread 0x7fffdaffd640 (LWP 102705)]
+[Thread 0x7fffdb7fe640 (LWP 102704) exited]
+[New Thread 0x7fffda7fc640 (LWP 102706)]
+[Thread 0x7fffdaffd640 (LWP 102705) exited]
+[New Thread 0x7fffd9ffb640 (LWP 102707)]
+[Thread 0x7fffda7fc640 (LWP 102706) exited]
+[New Thread 0x7fffd97fa640 (LWP 102708)]
+[Thread 0x7fffd9ffb640 (LWP 102707) exited]
+[New Thread 0x7fffd2ffd640 (LWP 102709)]
+[Thread 0x7fffd2ffd640 (LWP 102709) exited]
+[New Thread 0x7fffd27fc640 (LWP 102710)]
+[Thread 0x7fffd97fa640 (LWP 102708) exited]
+[New Thread 0x7fffd1ffb640 (LWP 102711)]
+[New Thread 0x7fffcbfff640 (LWP 102712)]
+[Thread 0x7fffd1ffb640 (LWP 102711) exited]
+[Thread 0x7fffd27fc640 (LWP 102710) exited]
+[New Thread 0x7fffcb7fe640 (LWP 102713)]
+[Thread 0x7fffcbfff640 (LWP 102712) exited]
+[Thread 0x7fffcb7fe640 (LWP 102713) exited]
+[REGISTRY-N0] Registered local KvServiceNode: group=3 (keyed for RPC routing)
+[REGISTRY-N0] Registered KvServiceNode: group=3 local_id=0
+[STORE-N0] Creating RaftNode for group=3 local_id=0...
+[RAFT-NODE-N0] BatchSystemBridge created for group=3
+[STORE-N0] Created RaftNode for group=3 local_id=0 (addr=127.0.0.1:51010)
+[STORE-N0] Creating ApplyFsm for group=3...
+[DEBUG-APPLY-FSM] CTOR: kv_node=0x555556185dc0 group=3 node=0 enc=2 n=7
+[BATCH-N0] Registered ApplyFsm, total applies=4
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=3
+[BATCH-N0] Registered ApplyFsm, total applies=4
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=3
+[STORE-N0] Creating PeerFsm for group=3...
+[PEER-G3-N0] PeerFsm created
+[PEER-G3-N0] RaftNode initialized at 0x5555561bb870
+[BATCH-N0] Registered PeerFsm, total peers=4
+[ROUTER-N0] Registered PeerFsm: group=3 node=0
+[ROUTER-N0] Registered PeerFsm Mailbox: group=3 node=0 mb=0x5555561e6c48
+[ROUTER-N0] Total registered peers: 4 groups: 4
+[STORE-N0] Created Raft instance: group=3 local_id=0
+[PHASE-5] Inspecting membership: group=4 local_id=0 cluster_cfg={6 5 4 3 2 1 0 }
+[New Thread 0x7fffcb7fe640 (LWP 102714)]
+[New Thread 0x7fffcbfff640 (LWP 102715)]
+[New Thread 0x7fffd1ffb640 (LWP 102716)]
+[Thread 0x7fffcbfff640 (LWP 102715) exited]
+[Thread 0x7fffcb7fe640 (LWP 102714) exited]
+[New Thread 0x7fffd27fc640 (LWP 102717)]
+[Thread 0x7fffd1ffb640 (LWP 102716) exited]
+[New Thread 0x7fffdaff9640 (LWP 102718)]
+[New Thread 0x7fffda7f8640 (LWP 102719)]
+[Thread 0x7fffdaff9640 (LWP 102718) exited]
+[Thread 0x7fffd27fc640 (LWP 102717) exited]
+[New Thread 0x7fffd9ff7640 (LWP 102720)]
+[Thread 0x7fffda7f8640 (LWP 102719) exited]
+[Thread 0x7fffd9ff7640 (LWP 102720) exited]
+[New Thread 0x7fffd97f6640 (LWP 102721)]
+[New Thread 0x7fffd8ff5640 (LWP 102722)]
+[Thread 0x7fffd97f6640 (LWP 102721) exited]
+[New Thread 0x7fffd3fff640 (LWP 102723)]
+[Thread 0x7fffd8ff5640 (LWP 102722) exited]
+[New Thread 0x7fffd2ffd640 (LWP 102724)]
+[Thread 0x7fffd3fff640 (LWP 102723) exited]
+[New Thread 0x7fffd17fa640 (LWP 102725)]
+[Thread 0x7fffd2ffd640 (LWP 102724) exited]
+[New Thread 0x7fffd0ff9640 (LWP 102726)]
+[Thread 0x7fffd17fa640 (LWP 102725) exited]
+[New Thread 0x7fffcaffd640 (LWP 102727)]
+[Thread 0x7fffd0ff9640 (LWP 102726) exited]
+[New Thread 0x7fffca7fc640 (LWP 102728)]
+[Thread 0x7fffcaffd640 (LWP 102727) exited]
+[Thread 0x7fffca7fc640 (LWP 102728) exited]
+[REGISTRY-N0] Registered local KvServiceNode: group=4 (keyed for RPC routing)
+[REGISTRY-N0] Registered KvServiceNode: group=4 local_id=0
+[STORE-N0] Creating RaftNode for group=4 local_id=0...
+[RAFT-NODE-N0] BatchSystemBridge created for group=4
+[STORE-N0] Created RaftNode for group=4 local_id=0 (addr=127.0.0.1:51010)
+[STORE-N0] Creating ApplyFsm for group=4...
+[DEBUG-APPLY-FSM] CTOR: kv_node=0x5555561e6830 group=4 node=0 enc=2 n=7
+[BATCH-N0] Registered ApplyFsm, total applies=5
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=4
+[BATCH-N0] Registered ApplyFsm, total applies=5
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=4
+[STORE-N0] Creating PeerFsm for group=4...
+[PEER-G4-N0] PeerFsm created
+[PEER-G4-N0] RaftNode initialized at 0x55555621eb70
+[BATCH-N0] Registered PeerFsm, total peers=5
+[ROUTER-N0] Registered PeerFsm: group=4 node=0
+[ROUTER-N0] Registered PeerFsm Mailbox: group=4 node=0 mb=0x555556238078
+[ROUTER-N0] Total registered peers: 5 groups: 5
+[STORE-N0] Created Raft instance: group=4 local_id=0
+[PHASE-5] Inspecting membership: group=5 local_id=0 cluster_cfg={6 5 4 3 2 1 0 }
+[New Thread 0x7fffca7fc640 (LWP 102729)]
+[New Thread 0x7fffcaffd640 (LWP 102730)]
+[Thread 0x7fffca7fc640 (LWP 102729) exited]
+[New Thread 0x7fffd0ff9640 (LWP 102731)]
+[Thread 0x7fffcaffd640 (LWP 102730) exited]
+[New Thread 0x7fffd17fa640 (LWP 102732)]
+[Thread 0x7fffd0ff9640 (LWP 102731) exited]
+[Thread 0x7fffd17fa640 (LWP 102732) exited]
+[New Thread 0x7fffd9ff3640 (LWP 102733)]
+[New Thread 0x7fffd97f2640 (LWP 102734)]
+[New Thread 0x7fffd8ff1640 (LWP 102735)]
+[Thread 0x7fffd97f2640 (LWP 102734) exited]
+[Thread 0x7fffd9ff3640 (LWP 102733) exited]
+[New Thread 0x7fffd3fff640 (LWP 102736)]
+[Thread 0x7fffd8ff1640 (LWP 102735) exited]
+[New Thread 0x7fffd2ffd640 (LWP 102737)]
+[Thread 0x7fffd3fff640 (LWP 102736) exited]
+[New Thread 0x7fffd27fc640 (LWP 102738)]
+[Thread 0x7fffd2ffd640 (LWP 102737) exited]
+[New Thread 0x7fffd1ffb640 (LWP 102739)]
+[Thread 0x7fffd27fc640 (LWP 102738) exited]
+[New Thread 0x7fffcbfff640 (LWP 102740)]
+[Thread 0x7fffd1ffb640 (LWP 102739) exited]
+[New Thread 0x7fffcb7fe640 (LWP 102741)]
+[Thread 0x7fffcbfff640 (LWP 102740) exited]
+[New Thread 0x7fffc9ffb640 (LWP 102742)]
+[Thread 0x7fffcb7fe640 (LWP 102741) exited]
+[New Thread 0x7fffc97fa640 (LWP 102743)]
+[Thread 0x7fffc9ffb640 (LWP 102742) exited]
+[Thread 0x7fffc97fa640 (LWP 102743) exited]
+[REGISTRY-N0] Registered local KvServiceNode: group=5 (keyed for RPC routing)
+[REGISTRY-N0] Registered KvServiceNode: group=5 local_id=0
+[STORE-N0] Creating RaftNode for group=5 local_id=0...
+[RAFT-NODE-N0] BatchSystemBridge created for group=5
+[STORE-N0] Created RaftNode for group=5 local_id=0 (addr=127.0.0.1:51010)
+[STORE-N0] Creating ApplyFsm for group=5...
+[DEBUG-APPLY-FSM] CTOR: kv_node=0x55555626e170 group=5 node=0 enc=2 n=7
+[BATCH-N0] Registered ApplyFsm, total applies=6
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=5
+[BATCH-N0] Registered ApplyFsm, total applies=6
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=5
+[STORE-N0] Creating PeerFsm for group=5...
+[PEER-G5-N0] PeerFsm created
+[PEER-G5-N0] RaftNode initialized at 0x5555562c9850
+[BATCH-N0] Registered PeerFsm, total peers=6
+[ROUTER-N0] Registered PeerFsm: group=5 node=0
+[ROUTER-N0] Registered PeerFsm Mailbox: group=5 node=0 mb=0x555556289ad8
+[ROUTER-N0] Total registered peers: 6 groups: 6
+[STORE-N0] Created Raft instance: group=5 local_id=0
+[PHASE-5] Inspecting membership: group=6 local_id=0 cluster_cfg={6 5 4 3 2 1 0 }
+[New Thread 0x7fffc97fa640 (LWP 102744)]
+[New Thread 0x7fffc9ffb640 (LWP 102745)]
+[Thread 0x7fffc97fa640 (LWP 102744) exited]
+[New Thread 0x7fffcb7fe640 (LWP 102746)]
+[Thread 0x7fffc9ffb640 (LWP 102745) exited]
+[New Thread 0x7fffcbfff640 (LWP 102747)]
+[Thread 0x7fffcb7fe640 (LWP 102746) exited]
+[New Thread 0x7fffd8fed640 (LWP 102748)]
+[Thread 0x7fffcbfff640 (LWP 102747) exited]
+[New Thread 0x7fffd3fff640 (LWP 102749)]
+[Thread 0x7fffd8fed640 (LWP 102748) exited]
+[New Thread 0x7fffd2ffd640 (LWP 102750)]
+[Thread 0x7fffd3fff640 (LWP 102749) exited]
+[New Thread 0x7fffd27fc640 (LWP 102751)]
+[Thread 0x7fffd2ffd640 (LWP 102750) exited]
+[New Thread 0x7fffd1ffb640 (LWP 102752)]
+[Thread 0x7fffd27fc640 (LWP 102751) exited]
+[New Thread 0x7fffd17fa640 (LWP 102753)]
+[Thread 0x7fffd1ffb640 (LWP 102752) exited]
+[New Thread 0x7fffd0ff9640 (LWP 102754)]
+[Thread 0x7fffd17fa640 (LWP 102753) exited]
+[New Thread 0x7fffcaffd640 (LWP 102755)]
+[Thread 0x7fffd0ff9640 (LWP 102754) exited]
+[New Thread 0x7fffca7fc640 (LWP 102756)]
+[Thread 0x7fffcaffd640 (LWP 102755) exited]
+[New Thread 0x7fffc8ff9640 (LWP 102757)]
+[Thread 0x7fffca7fc640 (LWP 102756) exited]
+[New Thread 0x7fffc3fff640 (LWP 102758)]
+[Thread 0x7fffc8ff9640 (LWP 102757) exited]
+[Thread 0x7fffc3fff640 (LWP 102758) exited]
+[REGISTRY-N0] Registered local KvServiceNode: group=6 (keyed for RPC routing)
+[REGISTRY-N0] Registered KvServiceNode: group=6 local_id=0
+[STORE-N0] Creating RaftNode for group=6 local_id=0...
+[RAFT-NODE-N0] BatchSystemBridge created for group=6
+[STORE-N0] Created RaftNode for group=6 local_id=0 (addr=127.0.0.1:51010)
+[STORE-N0] Creating ApplyFsm for group=6...
+[DEBUG-APPLY-FSM] CTOR: kv_node=0x5555562896f0 group=6 node=0 enc=2 n=7
+[BATCH-N0] Registered ApplyFsm, total applies=7
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=6
+[BATCH-N0] Registered ApplyFsm, total applies=7
+[RAFT-NODE-N0] ApplyFsm mailbox registered for group=6
+[STORE-N0] Creating PeerFsm for group=6...
+[PEER-G6-N0] PeerFsm created
+[PEER-G6-N0] RaftNode initialized at 0x5555562c0b60
+[BATCH-N0] Registered PeerFsm, total peers=7
+[ROUTER-N0] Registered PeerFsm: group=6 node=0
+[ROUTER-N0] Registered PeerFsm Mailbox: group=6 node=0 mb=0x5555562f4f98
+[ROUTER-N0] Total registered peers: 7 groups: 7
+[STORE-N0] Created Raft instance: group=6 local_id=0
+[STORE-N0] All 7 Raft instances created
+
+[PHASE-5] Raft instances created: 7
+################################################################
+
+################################################################
+#  PHASE 6: Unified Election Start
+################################################################
+
+[STORE-N0] Initializing all Raft instances...
+[REGISTRY-N0] Init KvServiceNode: group=6 local_id=0
+[REGISTRY-N0] Init KvServiceNode: group=5 local_id=0
+[REGISTRY-N0] Init KvServiceNode: group=4 local_id=0
+[REGISTRY-N0] Init KvServiceNode: group=3 local_id=0
+[REGISTRY-N0] Init KvServiceNode: group=2 local_id=0
+[REGISTRY-N0] Init KvServiceNode: group=1 local_id=0
+[REGISTRY-N0] Init KvServiceNode: group=0 local_id=0
+[RAFT-UNIFIED-SVC] Registered RaftState for group=0 (total: 1)
+[RAFT-NODE-N0] Registered with unified RPC service for group=0
+[ASYNC-SENDER] Registered transport handler for group=0 (total: 1)
+[ASYNC-MANAGER] Set transport handler for group=0
+[STORE-N0] Init Raft: group=0 node=0
+[RAFT-UNIFIED-SVC] Registered RaftState for group=1 (total: 2)
+[RAFT-NODE-N0] Registered with unified RPC service for group=1
+[ASYNC-SENDER] Registered transport handler for group=1 (total: 2)
+[ASYNC-MANAGER] Set transport handler for group=1
+[STORE-N0] Init Raft: group=1 node=0
+[RAFT-UNIFIED-SVC] Registered RaftState for group=2 (total: 3)
+[RAFT-NODE-N0] Registered with unified RPC service for group=2
+[ASYNC-SENDER] Registered transport handler for group=2 (total: 3)
+[ASYNC-MANAGER] Set transport handler for group=2
+[STORE-N0] Init Raft: group=2 node=0
+[RAFT-UNIFIED-SVC] Registered RaftState for group=3 (total: 4)
+[RAFT-NODE-N0] Registered with unified RPC service for group=3
+[ASYNC-SENDER] Registered transport handler for group=3 (total: 4)
+[ASYNC-MANAGER] Set transport handler for group=3
+[STORE-N0] Init Raft: group=3 node=0
+[RAFT-UNIFIED-SVC] Registered RaftState for group=4 (total: 5)
+[RAFT-NODE-N0] Registered with unified RPC service for group=4
+[ASYNC-SENDER] Registered transport handler for group=4 (total: 5)
+[ASYNC-MANAGER] Set transport handler for group=4
+[STORE-N0] Init Raft: group=4 node=0
+[RAFT-UNIFIED-SVC] Registered RaftState for group=5 (total: 6)
+[RAFT-NODE-N0] Registered with unified RPC service for group=5
+[ASYNC-SENDER] Registered transport handler for group=5 (total: 6)
+[ASYNC-MANAGER] Set transport handler for group=5
+[STORE-N0] Init Raft: group=5 node=0
+[RAFT-UNIFIED-SVC] Registered RaftState for group=6 (total: 7)
+[RAFT-NODE-N0] Registered with unified RPC service for group=6
+[ASYNC-SENDER] Registered transport handler for group=6 (total: 7)
+[ASYNC-MANAGER] Set transport handler for group=6
+[STORE-N0] Init Raft: group=6 node=0
+[STORE-N0] All Raft instances initialized
+
+
+[STORE-N0] Starting all Raft instances...
+[New Thread 0x7fffc3fff640 (LWP 102759)]
+[BATCH-TRANSPORT] Flush thread started
+[BATCH-TRANSPORT] Started with batch_size=32, flush_interval=1ms
+[RAFT-UNIFIED-P0] Server already running
+[FlexibleK Raft Starts Running]
+[New Thread 0x7fffc8ff9640 (LWP 102760)]
+[RAFT-NODE-N0] Ticker thread started
+[FlexibleK Raft Starts Running]
+[New Thread 0x7fffca7fc640 (LWP 102761)]
+[RAFT-NODE-N0] Ticker thread started
+[FlexibleK Raft Starts Running]
+[New Thread 0x7fffcaffd640 (LWP 102762)]
+[RAFT-NODE-N0] Ticker thread started
+[FlexibleK Raft Starts Running]
+[New Thread 0x7fffd8fed640 (LWP 102763)]
+[RAFT-NODE-N0] Ticker thread started
+[FlexibleK Raft Starts Running]
+[New Thread 0x7fffd3fff640 (LWP 102764)]
+[RAFT-NODE-N0] Ticker thread started
+[FlexibleK Raft Starts Running]
+[FlexibleK Raft Starts Running]
+[New Thread 0x7fffd0ff1640 (LWP 102765)]
+[New Thread 0x7fffcbfff640 (LWP 102766)]
+[New Thread 0x7fffcb7fe640 (LWP 102767)]
+[New Thread 0x7fffc9ffb640 (LWP 102768)]
+[New Thread 0x7fffc97fa640 (LWP 102769)]
+[New Thread 0x7fffbe7e0640 (LWP 102770)]
+[New Thread 0x7fffbdfdf640 (LWP 102771)]
+[New Thread 0x7fffbd7de640 (LWP 102772)]
+[New Thread 0x7fffbcfdd640 (LWP 102773)]
+[New Thread 0x7fffbc7dc640 (LWP 102774)]
+[New Thread 0x7fffbbfdb640 (LWP 102775)]
+[New Thread 0x7fffbb7da640 (LWP 102776)]
+[New Thread 0x7fffbafd9640 (LWP 102777)]
+[New Thread 0x7fffba7d8640 (LWP 102778)]
+[New Thread 0x7fffb9fd7640 (LWP 102779)]
+[New Thread 0x7fffb97d6640 (LWP 102780)]
+[New Thread 0x7fffb8fd5640 (LWP 102781)]
+[New Thread 0x7fffb87d4640 (LWP 102782)]
+[New Thread 0x7fffb7fd3640 (LWP 102783)]
+[New Thread 0x7fffb77d2640 (LWP 102784)]
+[New Thread 0x7fffb6fd1640 (LWP 102785)]
+[New Thread 0x7fffb67d0640 (LWP 102786)]
+[New Thread 0x7fffb5fcf640 (LWP 102787)]
+[New Thread 0x7fffb57ce640 (LWP 102788)]
+[New Thread 0x7fffb4fcd640 (LWP 102789)]
+[New Thread 0x7fffb47cc640 (LWP 102790)]
+[New Thread 0x7fffb3fcb640 (LWP 102791)]
+[New Thread 0x7fffb37ca640 (LWP 102792)]
+[New Thread 0x7fffb2fc9640 (LWP 102793)]
+[New Thread 0x7fffb27c8640 (LWP 102794)]
+[New Thread 0x7fffb1fc7640 (LWP 102795)]
+[New Thread 0x7fffb17c6640 (LWP 102796)]
+[New Thread 0x7fffb0fc5640 (LWP 102797)]
+[New Thread 0x7fffb07c4640 (LWP 102798)]
+[New Thread 0x7fffaffc3640 (LWP 102799)]
+[New Thread 0x7fffaf7c2640 (LWP 102800)]
+[New Thread 0x7fffaefc1640 (LWP 102801)]
+[New Thread 0x7fffae7c0640 (LWP 102802)]
+[New Thread 0x7fffadfbf640 (LWP 102803)]
+[RAFT-NODE-N0] Ticker thread started
+[REGISTRY-N0] Start KvServiceNode: group=6 local_id=0
+[RAFT-NODE-N0] Ticker thread started
+[KVNode Start Running]:
+[Storage Engine]: RocksDBEngine
+[REGISTRY-N0] Start KvServiceNode: group=5 local_id=0
+[KVNode Start Running]:
+[Storage Engine]: RocksDBEngine
+[REGISTRY-N0] Start KvServiceNode: group=4 local_id=0
+[KVNode Start Running]:
+[Storage Engine]: RocksDBEngine
+[REGISTRY-N0] Start KvServiceNode: group=3 local_id=0
+[KVNode Start Running]:
+[Storage Engine]: RocksDBEngine
+[REGISTRY-N0] Start KvServiceNode: group=2 local_id=0
+[KVNode Start Running]:
+[Storage Engine]: RocksDBEngine
+[REGISTRY-N0] Start KvServiceNode: group=1 local_id=0
+[KVNode Start Running]:
+[Storage Engine]: RocksDBEngine
+[REGISTRY-N0] Start KvServiceNode: group=0 local_id=0
+[KVNode Start Running]:
+[Storage Engine]: RocksDBEngine
+[BATCH-N0] Partitions built: 7 peers / 7 applys over 14+14 threads
+[BATCH-N0] Started: 14 peer + 14 apply threads
+[GOSSIP-N0] Gossip thread started
+[STORE-N0] Status print thread started (5s interval)
+[STORE-N0] All Raft instances started (election will begin)
+
+[REGISTRY-N0] About to start RPC server...
+[New Thread 0x7fffad7be640 (LWP 102804)]
+[New Thread 0x7fffacfbd640 (LWP 102805)]
+[REGISTRY-N0] RPC server started successfully
+[New Thread 0x7fffac7bc640 (LWP 102806)]
+[New Thread 0x7fffabfbb640 (LWP 102808)]
+[New Thread 0x7fffab7ba640 (LWP 102809)]
+[Thread 0x7fffab7ba640 (LWP 102809) exited]
+[Thread 0x7fffabfbb640 (LWP 102808) exited]
+[New Thread 0x7fffab7ba640 (LWP 102810)]
+[Thread 0x7fffab7ba640 (LWP 102810) exited]
+[New Thread 0x7fffab7ba640 (LWP 102811)]
+[New Thread 0x7fffabfbb640 (LWP 102812)]
+[New Thread 0x7fffaafb9640 (LWP 102813)]
+[Thread 0x7fffabfbb640 (LWP 102812) exited]
+[Thread 0x7fffaafb9640 (LWP 102813) exited]
+[Thread 0x7fffab7ba640 (LWP 102811) exited]
+[New Thread 0x7fffab7ba640 (LWP 102838)]
+[New Thread 0x7fffaafb9640 (LWP 102839)]
+[Thread 0x7fffab7ba640 (LWP 102838) exited]
+[Thread 0x7fffaafb9640 (LWP 102839) exited]
+[New Thread 0x7fffab7ba640 (LWP 102840)]
+[Thread 0x7fffab7ba640 (LWP 102840) exited]
+[New Thread 0x7fffaafb9640 (LWP 102841)]
+[Thread 0x7fffaafb9640 (LWP 102841) exited]
+[New Thread 0x7fffab7ba640 (LWP 102842)]
+[New Thread 0x7fffaafb9640 (LWP 102843)]
+[Thread 0x7fffab7ba640 (LWP 102842) exited]
+[Thread 0x7fffaafb9640 (LWP 102843) exited]
+[New Thread 0x7fffaafb9640 (LWP 102844)]
+[Thread 0x7fffaafb9640 (LWP 102844) exited]
+[New Thread 0x7fffaafb9640 (LWP 102845)]
+[Thread 0x7fffaafb9640 (LWP 102845) exited]
+[New Thread 0x7fffab7ba640 (LWP 102846)]
+[Thread 0x7fffab7ba640 (LWP 102846) exited]
+[New Thread 0x7fffab7ba640 (LWP 102847)]
+[Thread 0x7fffab7ba640 (LWP 102847) exited]
+[New Thread 0x7fffab7ba640 (LWP 102848)]
+[Thread 0x7fffab7ba640 (LWP 102848) exited]
+[New Thread 0x7fffab7ba640 (LWP 102849)]
+[Thread 0x7fffab7ba640 (LWP 102849) exited]
+[STORE-N0] DistributeLrcGrouper: distributed to 7 RaftNodes
+[PHASE-6] Elections started
+################################################################
+
+################################################################
+#  PHASE 7: Starting KV RPC Server
+################################################################
+[REGISTRY-N0] Starting KV RPC server at 127.0.0.1:60010
+[REGISTRY-N0] KV RPC server started (dispatcher mode)
+[STORE-N0] KV RPC server started
+[PHASE-7] KV RPC server started at 127.0.0.1:60010
+################################################################
+
+
+========================================
+         SERVER INFO SUMMARY
+========================================
+# Node ID:              0
+# Total Raft Groups:   7
+# Groups Per Node:      7
+# Peer Threads:         14
+# Apply Threads:        14
+# Batch Size:          32
+# Cluster Size:        7
+# Encoding Mode:       LRC
+========================================
+
+========================================
+   SERVER RUNNING - READY FOR YCSB BENCHMARK
+========================================
+# PID: 102645
+#
+# Commands:
+#   kill -USR2 102645  : Print Leader status
+#   kill -INT  102645  : Graceful shutdown
+#
+# Waiting for clients...
+========================================
+
+[ELECTION-G0-N0] Role changed: Follower -> Candidate (term=1, election_round=1, priority_rank=7/7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=0->1 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=1, priority=7)
+[RPC-CLIENT-N1] Connection pool (4 conns) to 127.0.0.1:51011
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=1, priority=7)
+[RPC-CLIENT-N2] Connection pool (4 conns) to 127.0.0.1:51012
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=1, priority=7)
+[RPC-CLIENT-N3] Connection pool (4 conns) to 127.0.0.1:51013
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=1, priority=7)
+[RPC-CLIENT-N4] Connection pool (4 conns) to 127.0.0.1:51014
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=1, priority=7)
+[RPC-CLIENT-N5] Connection pool (4 conns) to 127.0.0.1:51015
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=1, priority=7)
+[RPC-CLIENT-N6] Connection pool (4 conns) to 127.0.0.1:51016
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=1->2 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=2, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=2, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=2, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=2, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=2, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=2, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=2->3 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=3, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=3, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=3, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=3, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=3, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=3, priority=7)
+
+[TIMESTAMP: 1779972022] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffab7ba640 (LWP 102854)]
+[Thread 0x7fffab7ba640 (LWP 102854) exited]
+[New Thread 0x7fffaafb9640 (LWP 102855)]
+[Thread 0x7fffaafb9640 (LWP 102855) exited]
+[New Thread 0x7fffab7ba640 (LWP 102856)]
+[New Thread 0x7fffaafb9640 (LWP 102857)]
+[New Thread 0x7fffabfbb640 (LWP 102858)]
+[Thread 0x7fffaafb9640 (LWP 102857) exited]
+[New Thread 0x7fffaafb9640 (LWP 102859)]
+[Thread 0x7fffab7ba640 (LWP 102856) exited]
+[Thread 0x7fffabfbb640 (LWP 102858) exited]
+[Thread 0x7fffaafb9640 (LWP 102859) exited]
+[New Thread 0x7fffaafb9640 (LWP 102890)]
+[Thread 0x7fffaafb9640 (LWP 102890) exited]
+[New Thread 0x7fffabfbb640 (LWP 102891)]
+[Thread 0x7fffabfbb640 (LWP 102891) exited]
+[New Thread 0x7fffabfbb640 (LWP 102892)]
+[Thread 0x7fffabfbb640 (LWP 102892) exited]
+[New Thread 0x7fffabfbb640 (LWP 102893)]
+[Thread 0x7fffabfbb640 (LWP 102893) exited]
+[New Thread 0x7fffabfbb640 (LWP 102894)]
+[Thread 0x7fffabfbb640 (LWP 102894) exited]
+[New Thread 0x7fffaafb9640 (LWP 102895)]
+[Thread 0x7fffaafb9640 (LWP 102895) exited]
+[New Thread 0x7fffaafb9640 (LWP 102896)]
+[Thread 0x7fffaafb9640 (LWP 102896) exited]
+[New Thread 0x7fffabfbb640 (LWP 102897)]
+[Thread 0x7fffabfbb640 (LWP 102897) exited]
+[New Thread 0x7fffaafb9640 (LWP 102898)]
+[Thread 0x7fffaafb9640 (LWP 102898) exited]
+[New Thread 0x7fffabfbb640 (LWP 102899)]
+[New Thread 0x7fffaafb9640 (LWP 102900)]
+[Thread 0x7fffaafb9640 (LWP 102900) exited]
+[Thread 0x7fffabfbb640 (LWP 102899) exited]
+[New Thread 0x7fffaafb9640 (LWP 102901)]
+[Thread 0x7fffaafb9640 (LWP 102901) exited]
+[New Thread 0x7fffaafb9640 (LWP 102902)]
+[New Thread 0x7fffabfbb640 (LWP 102903)]
+[Thread 0x7fffaafb9640 (LWP 102902) exited]
+[Thread 0x7fffabfbb640 (LWP 102903) exited]
+[New Thread 0x7fffaafb9640 (LWP 102904)]
+[Thread 0x7fffaafb9640 (LWP 102904) exited]
+[New Thread 0x7fffaafb9640 (LWP 102905)]
+[Thread 0x7fffaafb9640 (LWP 102905) exited]
+[New Thread 0x7fffabfbb640 (LWP 102906)]
+[Thread 0x7fffabfbb640 (LWP 102906) exited]
+[New Thread 0x7fffaafb9640 (LWP 102907)]
+[Thread 0x7fffaafb9640 (LWP 102907) exited]
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=3->4 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=4, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=4, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=4, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=4, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=4, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=4, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=4->5 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=5, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=5, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=5, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=5, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=5, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=5, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=5->6 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=6, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=6, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=6, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=6, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=6, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=6, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=6->7 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=7, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=7, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=7, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=7, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=7, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=7, priority=7)
+
+[TIMESTAMP: 1779972027] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffaafb9640 (LWP 102908)]
+[New Thread 0x7fffabfbb640 (LWP 102909)]
+[Thread 0x7fffaafb9640 (LWP 102908) exited]
+[New Thread 0x7fffaafb9640 (LWP 102910)]
+[Thread 0x7fffabfbb640 (LWP 102909) exited]
+[Thread 0x7fffaafb9640 (LWP 102910) exited]
+[New Thread 0x7fffabfbb640 (LWP 102911)]
+[Thread 0x7fffabfbb640 (LWP 102911) exited]
+[New Thread 0x7fffaafb9640 (LWP 102912)]
+[Thread 0x7fffaafb9640 (LWP 102912) exited]
+[New Thread 0x7fffabfbb640 (LWP 102913)]
+[Thread 0x7fffabfbb640 (LWP 102913) exited]
+[New Thread 0x7fffabfbb640 (LWP 102914)]
+[New Thread 0x7fffaafb9640 (LWP 102915)]
+[Thread 0x7fffabfbb640 (LWP 102914) exited]
+[New Thread 0x7fffabfbb640 (LWP 102916)]
+[Thread 0x7fffabfbb640 (LWP 102916) exited]
+[Thread 0x7fffaafb9640 (LWP 102915) exited]
+[New Thread 0x7fffab7ba640 (LWP 102917)]
+[Thread 0x7fffab7ba640 (LWP 102917) exited]
+[New Thread 0x7fffab7ba640 (LWP 102918)]
+[Thread 0x7fffab7ba640 (LWP 102918) exited]
+[New Thread 0x7fffabfbb640 (LWP 102919)]
+[Thread 0x7fffabfbb640 (LWP 102919) exited]
+[New Thread 0x7fffabfbb640 (LWP 102932)]
+[New Thread 0x7fffab7ba640 (LWP 102933)]
+[Thread 0x7fffabfbb640 (LWP 102932) exited]
+[New Thread 0x7fffaafb9640 (LWP 102934)]
+[Thread 0x7fffab7ba640 (LWP 102933) exited]
+[Thread 0x7fffaafb9640 (LWP 102934) exited]
+[New Thread 0x7fffab7ba640 (LWP 102935)]
+[Thread 0x7fffab7ba640 (LWP 102935) exited]
+[New Thread 0x7fffaafb9640 (LWP 102936)]
+[Thread 0x7fffaafb9640 (LWP 102936) exited]
+[New Thread 0x7fffab7ba640 (LWP 102937)]
+[Thread 0x7fffab7ba640 (LWP 102937) exited]
+[New Thread 0x7fffab7ba640 (LWP 102938)]
+[New Thread 0x7fffaafb9640 (LWP 102939)]
+[Thread 0x7fffab7ba640 (LWP 102938) exited]
+[Thread 0x7fffaafb9640 (LWP 102939) exited]
+[New Thread 0x7fffab7ba640 (LWP 102940)]
+[Thread 0x7fffab7ba640 (LWP 102940) exited]
+[New Thread 0x7fffab7ba640 (LWP 102941)]
+[Thread 0x7fffab7ba640 (LWP 102941) exited]
+[New Thread 0x7fffaafb9640 (LWP 102942)]
+[Thread 0x7fffaafb9640 (LWP 102942) exited]
+[New Thread 0x7fffab7ba640 (LWP 102943)]
+[Thread 0x7fffab7ba640 (LWP 102943) exited]
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=7->8 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=8, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=8, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=8, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=8, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=8, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=8, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=8->9 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=9, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=9, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=9, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=9, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=9, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=9, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=9->10 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=10, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=10, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=10, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=10, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=10, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=10, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=10->11 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=11, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=11, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=11, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=11, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=11, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=11, priority=7)
+
+[TIMESTAMP: 1779972032] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffab7ba640 (LWP 102944)]
+[Thread 0x7fffab7ba640 (LWP 102944) exited]
+[New Thread 0x7fffaafb9640 (LWP 102945)]
+[Thread 0x7fffaafb9640 (LWP 102945) exited]
+[New Thread 0x7fffaafb9640 (LWP 102946)]
+[Thread 0x7fffaafb9640 (LWP 102946) exited]
+[New Thread 0x7fffaafb9640 (LWP 102947)]
+[Thread 0x7fffaafb9640 (LWP 102947) exited]
+[New Thread 0x7fffab7ba640 (LWP 102948)]
+[New Thread 0x7fffaafb9640 (LWP 102949)]
+[Thread 0x7fffab7ba640 (LWP 102948) exited]
+[Thread 0x7fffaafb9640 (LWP 102949) exited]
+[New Thread 0x7fffaafb9640 (LWP 102953)]
+[New Thread 0x7fffab7ba640 (LWP 102954)]
+[Thread 0x7fffaafb9640 (LWP 102953) exited]
+[New Thread 0x7fffaafb9640 (LWP 102955)]
+[Thread 0x7fffaafb9640 (LWP 102955) exited]
+[Thread 0x7fffab7ba640 (LWP 102954) exited]
+[New Thread 0x7fffab7ba640 (LWP 102956)]
+[New Thread 0x7fffaafb9640 (LWP 102957)]
+[Thread 0x7fffaafb9640 (LWP 102957) exited]
+[Thread 0x7fffab7ba640 (LWP 102956) exited]
+[New Thread 0x7fffabfbb640 (LWP 102958)]
+[Thread 0x7fffabfbb640 (LWP 102958) exited]
+[New Thread 0x7fffabfbb640 (LWP 102968)]
+[New Thread 0x7fffaafb9640 (LWP 102969)]
+[New Thread 0x7fffab7ba640 (LWP 102970)]
+[Thread 0x7fffabfbb640 (LWP 102968) exited]
+[Thread 0x7fffaafb9640 (LWP 102969) exited]
+[New Thread 0x7fffaafb9640 (LWP 102971)]
+[Thread 0x7fffab7ba640 (LWP 102970) exited]
+[New Thread 0x7fffab7ba640 (LWP 102972)]
+[Thread 0x7fffaafb9640 (LWP 102971) exited]
+[New Thread 0x7fffaafb9640 (LWP 102973)]
+[Thread 0x7fffab7ba640 (LWP 102972) exited]
+[Thread 0x7fffaafb9640 (LWP 102973) exited]
+[New Thread 0x7fffaafb9640 (LWP 102975)]
+[New Thread 0x7fffab7ba640 (LWP 102976)]
+[Thread 0x7fffaafb9640 (LWP 102975) exited]
+[New Thread 0x7fffaafb9640 (LWP 102977)]
+[New Thread 0x7fffabfbb640 (LWP 102978)]
+[Thread 0x7fffaafb9640 (LWP 102977) exited]
+[Thread 0x7fffab7ba640 (LWP 102976) exited]
+[New Thread 0x7fffaafb9640 (LWP 102979)]
+[Thread 0x7fffabfbb640 (LWP 102978) exited]
+[New Thread 0x7fffabfbb640 (LWP 102980)]
+[Thread 0x7fffabfbb640 (LWP 102980) exited]
+[Thread 0x7fffaafb9640 (LWP 102979) exited]
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=11->12 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=12, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=12, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=12, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=12, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=12, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=12, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=12->13 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=13, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=13, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=13, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=13, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=13, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=13, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=13->14 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=14, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=14, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=14, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=14, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=14, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=14, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=14->15 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=15, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=15, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=15, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=15, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=15, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=15, priority=7)
+
+[TIMESTAMP: 1779972037] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffaafb9640 (LWP 102981)]
+[New Thread 0x7fffabfbb640 (LWP 102982)]
+[Thread 0x7fffabfbb640 (LWP 102982) exited]
+[Thread 0x7fffaafb9640 (LWP 102981) exited]
+[New Thread 0x7fffab7ba640 (LWP 102983)]
+[Thread 0x7fffab7ba640 (LWP 102983) exited]
+[New Thread 0x7fffabfbb640 (LWP 102984)]
+[Thread 0x7fffabfbb640 (LWP 102984) exited]
+[New Thread 0x7fffab7ba640 (LWP 102985)]
+[New Thread 0x7fffabfbb640 (LWP 102986)]
+[Thread 0x7fffabfbb640 (LWP 102986) exited]
+[Thread 0x7fffab7ba640 (LWP 102985) exited]
+[New Thread 0x7fffabfbb640 (LWP 102988)]
+[New Thread 0x7fffab7ba640 (LWP 102989)]
+[New Thread 0x7fffaafb9640 (LWP 102990)]
+[Thread 0x7fffab7ba640 (LWP 102989) exited]
+[Thread 0x7fffaafb9640 (LWP 102990) exited]
+[Thread 0x7fffabfbb640 (LWP 102988) exited]
+[New Thread 0x7fffab7ba640 (LWP 102991)]
+[Thread 0x7fffab7ba640 (LWP 102991) exited]
+[New Thread 0x7fffaafb9640 (LWP 102992)]
+[Thread 0x7fffaafb9640 (LWP 102992) exited]
+[New Thread 0x7fffaafb9640 (LWP 102993)]
+[Thread 0x7fffaafb9640 (LWP 102993) exited]
+[New Thread 0x7fffaafb9640 (LWP 103006)]
+[New Thread 0x7fffab7ba640 (LWP 103007)]
+[Thread 0x7fffaafb9640 (LWP 103006) exited]
+[New Thread 0x7fffaafb9640 (LWP 103008)]
+[Thread 0x7fffaafb9640 (LWP 103008) exited]
+[Thread 0x7fffab7ba640 (LWP 103007) exited]
+[New Thread 0x7fffabfbb640 (LWP 103009)]
+[Thread 0x7fffabfbb640 (LWP 103009) exited]
+[New Thread 0x7fffaafb9640 (LWP 103010)]
+[Thread 0x7fffaafb9640 (LWP 103010) exited]
+[New Thread 0x7fffabfbb640 (LWP 103011)]
+[Thread 0x7fffabfbb640 (LWP 103011) exited]
+[New Thread 0x7fffabfbb640 (LWP 103017)]
+[New Thread 0x7fffaafb9640 (LWP 103018)]
+[Thread 0x7fffabfbb640 (LWP 103017) exited]
+[New Thread 0x7fffabfbb640 (LWP 103019)]
+[Thread 0x7fffaafb9640 (LWP 103018) exited]
+[New Thread 0x7fffaafb9640 (LWP 103020)]
+[Thread 0x7fffabfbb640 (LWP 103019) exited]
+[New Thread 0x7fffabfbb640 (LWP 103021)]
+[Thread 0x7fffaafb9640 (LWP 103020) exited]
+[New Thread 0x7fffaafb9640 (LWP 103022)]
+[Thread 0x7fffabfbb640 (LWP 103021) exited]
+[Thread 0x7fffaafb9640 (LWP 103022) exited]
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=15->16 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=16, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=16, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=16, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=16, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=16, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=16, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=16->17 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=17, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=17, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=17, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=17, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=17, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=17, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=17->18 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=18, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=18, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=18, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=18, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=18, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=18, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=18->19 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=19, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=19, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=19, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=19, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=19, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=19, priority=7)
+
+[TIMESTAMP: 1779972042] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffaafb9640 (LWP 103023)]
+[New Thread 0x7fffabfbb640 (LWP 103024)]
+[Thread 0x7fffaafb9640 (LWP 103023) exited]
+[New Thread 0x7fffaafb9640 (LWP 103025)]
+[Thread 0x7fffabfbb640 (LWP 103024) exited]
+[Thread 0x7fffaafb9640 (LWP 103025) exited]
+[New Thread 0x7fffabfbb640 (LWP 103026)]
+[Thread 0x7fffabfbb640 (LWP 103026) exited]
+[New Thread 0x7fffaafb9640 (LWP 103027)]
+[Thread 0x7fffaafb9640 (LWP 103027) exited]
+[New Thread 0x7fffabfbb640 (LWP 103028)]
+[Thread 0x7fffabfbb640 (LWP 103028) exited]
+[New Thread 0x7fffabfbb640 (LWP 103040)]
+[Thread 0x7fffabfbb640 (LWP 103040) exited]
+[New Thread 0x7fffaafb9640 (LWP 103041)]
+[New Thread 0x7fffabfbb640 (LWP 103042)]
+[Thread 0x7fffabfbb640 (LWP 103042) exited]
+[Thread 0x7fffaafb9640 (LWP 103041) exited]
+[New Thread 0x7fffaafb9640 (LWP 103043)]
+[New Thread 0x7fffabfbb640 (LWP 103044)]
+[Thread 0x7fffaafb9640 (LWP 103043) exited]
+[New Thread 0x7fffaafb9640 (LWP 103045)]
+[Thread 0x7fffabfbb640 (LWP 103044) exited]
+[Thread 0x7fffaafb9640 (LWP 103045) exited]
+[New Thread 0x7fffaafb9640 (LWP 103047)]
+[Thread 0x7fffaafb9640 (LWP 103047) exited]
+[New Thread 0x7fffabfbb640 (LWP 103048)]
+[New Thread 0x7fffaafb9640 (LWP 103049)]
+[Thread 0x7fffaafb9640 (LWP 103049) exited]
+[Thread 0x7fffabfbb640 (LWP 103048) exited]
+[New Thread 0x7fffab7ba640 (LWP 103050)]
+[New Thread 0x7fffaafb9640 (LWP 103051)]
+[Thread 0x7fffaafb9640 (LWP 103051) exited]
+[Thread 0x7fffab7ba640 (LWP 103050) exited]
+[New Thread 0x7fffabfbb640 (LWP 103052)]
+[Thread 0x7fffabfbb640 (LWP 103052) exited]
+[New Thread 0x7fffabfbb640 (LWP 103054)]
+[New Thread 0x7fffab7ba640 (LWP 103055)]
+[Thread 0x7fffabfbb640 (LWP 103054) exited]
+[New Thread 0x7fffaafb9640 (LWP 103056)]
+[Thread 0x7fffab7ba640 (LWP 103055) exited]
+[Thread 0x7fffaafb9640 (LWP 103056) exited]
+[New Thread 0x7fffab7ba640 (LWP 103057)]
+[Thread 0x7fffab7ba640 (LWP 103057) exited]
+[New Thread 0x7fffaafb9640 (LWP 103058)]
+[Thread 0x7fffaafb9640 (LWP 103058) exited]
+[New Thread 0x7fffab7ba640 (LWP 103059)]
+[Thread 0x7fffab7ba640 (LWP 103059) exited]
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=19->20 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=20, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=20, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=20, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=20, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=20, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=20, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=20->21 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=21, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=21, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=21, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=21, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=21, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=21, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=21->22 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=22, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=22, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=22, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=22, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=22, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=22, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=22->23 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=23, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=23, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=23, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=23, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=23, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=23, priority=7)
+
+[TIMESTAMP: 1779972047] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffab7ba640 (LWP 103060)]
+[Thread 0x7fffab7ba640 (LWP 103060) exited]
+[New Thread 0x7fffaafb9640 (LWP 103061)]
+[Thread 0x7fffaafb9640 (LWP 103061) exited]
+[New Thread 0x7fffab7ba640 (LWP 103062)]
+[New Thread 0x7fffaafb9640 (LWP 103063)]
+[Thread 0x7fffab7ba640 (LWP 103062) exited]
+[Thread 0x7fffaafb9640 (LWP 103063) exited]
+[New Thread 0x7fffab7ba640 (LWP 103064)]
+[New Thread 0x7fffaafb9640 (LWP 103065)]
+[Thread 0x7fffab7ba640 (LWP 103064) exited]
+[Thread 0x7fffaafb9640 (LWP 103065) exited]
+[New Thread 0x7fffaafb9640 (LWP 103077)]
+[New Thread 0x7fffab7ba640 (LWP 103078)]
+[Thread 0x7fffaafb9640 (LWP 103077) exited]
+[New Thread 0x7fffaafb9640 (LWP 103079)]
+[Thread 0x7fffab7ba640 (LWP 103078) exited]
+[New Thread 0x7fffab7ba640 (LWP 103080)]
+[New Thread 0x7fffabfbb640 (LWP 103081)]
+[Thread 0x7fffab7ba640 (LWP 103080) exited]
+[Thread 0x7fffaafb9640 (LWP 103079) exited]
+[New Thread 0x7fffab7ba640 (LWP 103082)]
+[Thread 0x7fffabfbb640 (LWP 103081) exited]
+[Thread 0x7fffab7ba640 (LWP 103082) exited]
+[New Thread 0x7fffab7ba640 (LWP 103083)]
+[Thread 0x7fffab7ba640 (LWP 103083) exited]
+[New Thread 0x7fffabfbb640 (LWP 103084)]
+[Thread 0x7fffabfbb640 (LWP 103084) exited]
+[New Thread 0x7fffab7ba640 (LWP 103085)]
+[New Thread 0x7fffabfbb640 (LWP 103086)]
+[Thread 0x7fffabfbb640 (LWP 103086) exited]
+[Thread 0x7fffab7ba640 (LWP 103085) exited]
+[New Thread 0x7fffaafb9640 (LWP 103087)]
+[Thread 0x7fffaafb9640 (LWP 103087) exited]
+[New Thread 0x7fffabfbb640 (LWP 103088)]
+[Thread 0x7fffabfbb640 (LWP 103088) exited]
+[New Thread 0x7fffabfbb640 (LWP 103089)]
+[New Thread 0x7fffaafb9640 (LWP 103090)]
+[Thread 0x7fffaafb9640 (LWP 103090) exited]
+[Thread 0x7fffabfbb640 (LWP 103089) exited]
+[New Thread 0x7fffab7ba640 (LWP 103091)]
+[Thread 0x7fffab7ba640 (LWP 103091) exited]
+[New Thread 0x7fffaafb9640 (LWP 103092)]
+[New Thread 0x7fffab7ba640 (LWP 103093)]
+[Thread 0x7fffaafb9640 (LWP 103092) exited]
+[New Thread 0x7fffabfbb640 (LWP 103094)]
+[Thread 0x7fffabfbb640 (LWP 103094) exited]
+[Thread 0x7fffab7ba640 (LWP 103093) exited]
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=23->24 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=24, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=24, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=24, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=24, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=24, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=24, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=24->25 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=25, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=25, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=25, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=25, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=25, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=25, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=25->26 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=26, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=26, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=26, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=26, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=26, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=26, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=26->27 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=27, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=27, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=27, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=27, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=27, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=27, priority=7)
+
+[TIMESTAMP: 1779972052] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffabfbb640 (LWP 103096)]
+[New Thread 0x7fffab7ba640 (LWP 103097)]
+[Thread 0x7fffabfbb640 (LWP 103096) exited]
+[New Thread 0x7fffabfbb640 (LWP 103098)]
+[Thread 0x7fffab7ba640 (LWP 103097) exited]
+[Thread 0x7fffabfbb640 (LWP 103098) exited]
+[New Thread 0x7fffab7ba640 (LWP 103099)]
+[New Thread 0x7fffabfbb640 (LWP 103100)]
+[Thread 0x7fffab7ba640 (LWP 103099) exited]
+[Thread 0x7fffabfbb640 (LWP 103100) exited]
+[New Thread 0x7fffab7ba640 (LWP 103101)]
+[Thread 0x7fffab7ba640 (LWP 103101) exited]
+[New Thread 0x7fffab7ba640 (LWP 103102)]
+[New Thread 0x7fffabfbb640 (LWP 103103)]
+[Thread 0x7fffabfbb640 (LWP 103103) exited]
+[Thread 0x7fffab7ba640 (LWP 103102) exited]
+[New Thread 0x7fffab7ba640 (LWP 103104)]
+[Thread 0x7fffab7ba640 (LWP 103104) exited]
+[New Thread 0x7fffabfbb640 (LWP 103105)]
+[Thread 0x7fffabfbb640 (LWP 103105) exited]
+[New Thread 0x7fffab7ba640 (LWP 103106)]
+[Thread 0x7fffab7ba640 (LWP 103106) exited]
+[New Thread 0x7fffabfbb640 (LWP 103107)]
+[Thread 0x7fffabfbb640 (LWP 103107) exited]
+[New Thread 0x7fffabfbb640 (LWP 103119)]
+[New Thread 0x7fffab7ba640 (LWP 103120)]
+[Thread 0x7fffabfbb640 (LWP 103119) exited]
+[Thread 0x7fffab7ba640 (LWP 103120) exited]
+[New Thread 0x7fffabfbb640 (LWP 103121)]
+[Thread 0x7fffabfbb640 (LWP 103121) exited]
+[New Thread 0x7fffab7ba640 (LWP 103122)]
+[Thread 0x7fffab7ba640 (LWP 103122) exited]
+[New Thread 0x7fffabfbb640 (LWP 103123)]
+[New Thread 0x7fffab7ba640 (LWP 103124)]
+[Thread 0x7fffab7ba640 (LWP 103124) exited]
+[Thread 0x7fffabfbb640 (LWP 103123) exited]
+[New Thread 0x7fffabfbb640 (LWP 103125)]
+[New Thread 0x7fffab7ba640 (LWP 103126)]
+[Thread 0x7fffabfbb640 (LWP 103125) exited]
+[New Thread 0x7fffaafb9640 (LWP 103127)]
+[Thread 0x7fffab7ba640 (LWP 103126) exited]
+[Thread 0x7fffaafb9640 (LWP 103127) exited]
+[New Thread 0x7fffab7ba640 (LWP 103128)]
+[New Thread 0x7fffaafb9640 (LWP 103129)]
+[Thread 0x7fffaafb9640 (LWP 103129) exited]
+[Thread 0x7fffab7ba640 (LWP 103128) exited]
+[New Thread 0x7fffab7ba640 (LWP 103130)]
+[Thread 0x7fffab7ba640 (LWP 103130) exited]
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=27->28 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=28, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=28, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=28, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=28, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=28, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=28, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=28->29 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=29, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=29, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=29, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=29, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=29, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=29, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=29->30 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=30, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=30, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=30, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=30, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=30, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=30, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=30->31 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=31, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=31, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=31, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=31, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=31, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=31, priority=7)
+
+[TIMESTAMP: 1779972057] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffab7ba640 (LWP 103131)]
+[Thread 0x7fffab7ba640 (LWP 103131) exited]
+[New Thread 0x7fffaafb9640 (LWP 103132)]
+[Thread 0x7fffaafb9640 (LWP 103132) exited]
+[New Thread 0x7fffab7ba640 (LWP 103133)]
+[Thread 0x7fffab7ba640 (LWP 103133) exited]
+[New Thread 0x7fffaafb9640 (LWP 103134)]
+[Thread 0x7fffaafb9640 (LWP 103134) exited]
+[New Thread 0x7fffaafb9640 (LWP 103135)]
+[Thread 0x7fffaafb9640 (LWP 103135) exited]
+[New Thread 0x7fffab7ba640 (LWP 103136)]
+[Thread 0x7fffab7ba640 (LWP 103136) exited]
+[New Thread 0x7fffab7ba640 (LWP 103137)]
+[New Thread 0x7fffaafb9640 (LWP 103138)]
+[Thread 0x7fffab7ba640 (LWP 103137) exited]
+[New Thread 0x7fffab7ba640 (LWP 103139)]
+[Thread 0x7fffaafb9640 (LWP 103138) exited]
+[Thread 0x7fffab7ba640 (LWP 103139) exited]
+[New Thread 0x7fffaafb9640 (LWP 103140)]
+[Thread 0x7fffaafb9640 (LWP 103140) exited]
+[New Thread 0x7fffab7ba640 (LWP 103141)]
+[Thread 0x7fffab7ba640 (LWP 103141) exited]
+[New Thread 0x7fffab7ba640 (LWP 103142)]
+[Thread 0x7fffab7ba640 (LWP 103142) exited]
+[New Thread 0x7fffab7ba640 (LWP 103154)]
+[New Thread 0x7fffaafb9640 (LWP 103155)]
+[Thread 0x7fffab7ba640 (LWP 103154) exited]
+[New Thread 0x7fffab7ba640 (LWP 103156)]
+[Thread 0x7fffab7ba640 (LWP 103156) exited]
+[Thread 0x7fffaafb9640 (LWP 103155) exited]
+[New Thread 0x7fffaafb9640 (LWP 103157)]
+[New Thread 0x7fffab7ba640 (LWP 103158)]
+[Thread 0x7fffaafb9640 (LWP 103157) exited]
+[Thread 0x7fffab7ba640 (LWP 103158) exited]
+[New Thread 0x7fffaafb9640 (LWP 103159)]
+[Thread 0x7fffaafb9640 (LWP 103159) exited]
+[New Thread 0x7fffaafb9640 (LWP 103160)]
+[Thread 0x7fffaafb9640 (LWP 103160) exited]
+[New Thread 0x7fffab7ba640 (LWP 103161)]
+[New Thread 0x7fffaafb9640 (LWP 103162)]
+[Thread 0x7fffab7ba640 (LWP 103161) exited]
+[New Thread 0x7fffab7ba640 (LWP 103163)]
+[Thread 0x7fffaafb9640 (LWP 103162) exited]
+[Thread 0x7fffab7ba640 (LWP 103163) exited]
+[New Thread 0x7fffaafb9640 (LWP 103164)]
+[Thread 0x7fffaafb9640 (LWP 103164) exited]
+[New Thread 0x7fffab7ba640 (LWP 103165)]
+[Thread 0x7fffab7ba640 (LWP 103165) exited]
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=31->32 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=32, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=32, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=32, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=32, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=32, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=32, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=32->33 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=33, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=33, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=33, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=33, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=33, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=33, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=33->34 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=34, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=34, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=34, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=34, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=34, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=34, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=34->35 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=35, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=35, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=35, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=35, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=35, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=35, priority=7)
+
+[TIMESTAMP: 1779972062] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffab7ba640 (LWP 103166)]
+[New Thread 0x7fffaafb9640 (LWP 103167)]
+[Thread 0x7fffab7ba640 (LWP 103166) exited]
+[New Thread 0x7fffabfbb640 (LWP 103168)]
+[Thread 0x7fffaafb9640 (LWP 103167) exited]
+[Thread 0x7fffabfbb640 (LWP 103168) exited]
+[New Thread 0x7fffaafb9640 (LWP 103169)]
+[Thread 0x7fffaafb9640 (LWP 103169) exited]
+[New Thread 0x7fffabfbb640 (LWP 103170)]
+[Thread 0x7fffabfbb640 (LWP 103170) exited]
+[New Thread 0x7fffaafb9640 (LWP 103171)]
+[Thread 0x7fffaafb9640 (LWP 103171) exited]
+[New Thread 0x7fffaafb9640 (LWP 103172)]
+[Thread 0x7fffaafb9640 (LWP 103172) exited]
+[New Thread 0x7fffabfbb640 (LWP 103173)]
+[New Thread 0x7fffaafb9640 (LWP 103174)]
+[Thread 0x7fffabfbb640 (LWP 103173) exited]
+[Thread 0x7fffaafb9640 (LWP 103174) exited]
+[New Thread 0x7fffaafb9640 (LWP 103175)]
+[New Thread 0x7fffabfbb640 (LWP 103176)]
+[Thread 0x7fffabfbb640 (LWP 103176) exited]
+[New Thread 0x7fffab7ba640 (LWP 103177)]
+[Thread 0x7fffaafb9640 (LWP 103175) exited]
+[Thread 0x7fffab7ba640 (LWP 103177) exited]
+[New Thread 0x7fffab7ba640 (LWP 103190)]
+[Thread 0x7fffab7ba640 (LWP 103190) exited]
+[New Thread 0x7fffaafb9640 (LWP 103191)]
+[Thread 0x7fffaafb9640 (LWP 103191) exited]
+[New Thread 0x7fffab7ba640 (LWP 103192)]
+[Thread 0x7fffab7ba640 (LWP 103192) exited]
+[New Thread 0x7fffaafb9640 (LWP 103193)]
+[Thread 0x7fffaafb9640 (LWP 103193) exited]
+[New Thread 0x7fffab7ba640 (LWP 103194)]
+[Thread 0x7fffab7ba640 (LWP 103194) exited]
+[New Thread 0x7fffaafb9640 (LWP 103195)]
+[Thread 0x7fffaafb9640 (LWP 103195) exited]
+[New Thread 0x7fffaafb9640 (LWP 103196)]
+[New Thread 0x7fffab7ba640 (LWP 103197)]
+[Thread 0x7fffaafb9640 (LWP 103196) exited]
+[Thread 0x7fffab7ba640 (LWP 103197) exited]
+[New Thread 0x7fffaafb9640 (LWP 103198)]
+[Thread 0x7fffaafb9640 (LWP 103198) exited]
+[New Thread 0x7fffab7ba640 (LWP 103199)]
+[Thread 0x7fffab7ba640 (LWP 103199) exited]
+[New Thread 0x7fffaafb9640 (LWP 103200)]
+[Thread 0x7fffaafb9640 (LWP 103200) exited]
+[New Thread 0x7fffab7ba640 (LWP 103201)]
+[Thread 0x7fffab7ba640 (LWP 103201) exited]
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=35->36 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=36, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=36, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=36, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=36, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=36, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=36, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=36->37 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=37, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=37, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=37, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=37, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=37, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=37, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=37->38 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=38, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=38, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=38, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=38, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=38, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=38, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=38->39 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=39, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=39, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=39, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=39, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=39, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=39, priority=7)
+
+[TIMESTAMP: 1779972067] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffab7ba640 (LWP 103202)]
+[Thread 0x7fffab7ba640 (LWP 103202) exited]
+[New Thread 0x7fffaafb9640 (LWP 103203)]
+[New Thread 0x7fffab7ba640 (LWP 103204)]
+[Thread 0x7fffaafb9640 (LWP 103203) exited]
+[Thread 0x7fffab7ba640 (LWP 103204) exited]
+[New Thread 0x7fffaafb9640 (LWP 103205)]
+[Thread 0x7fffaafb9640 (LWP 103205) exited]
+[New Thread 0x7fffab7ba640 (LWP 103206)]
+[Thread 0x7fffab7ba640 (LWP 103206) exited]
+[New Thread 0x7fffaafb9640 (LWP 103207)]
+[Thread 0x7fffaafb9640 (LWP 103207) exited]
+[New Thread 0x7fffaafb9640 (LWP 103208)]
+[New Thread 0x7fffab7ba640 (LWP 103209)]
+[Thread 0x7fffaafb9640 (LWP 103208) exited]
+[Thread 0x7fffab7ba640 (LWP 103209) exited]
+[New Thread 0x7fffaafb9640 (LWP 103210)]
+[Thread 0x7fffaafb9640 (LWP 103210) exited]
+[New Thread 0x7fffab7ba640 (LWP 103211)]
+[Thread 0x7fffab7ba640 (LWP 103211) exited]
+[New Thread 0x7fffaafb9640 (LWP 103212)]
+[New Thread 0x7fffab7ba640 (LWP 103213)]
+[Thread 0x7fffaafb9640 (LWP 103212) exited]
+[Thread 0x7fffab7ba640 (LWP 103213) exited]
+[New Thread 0x7fffab7ba640 (LWP 103225)]
+[Thread 0x7fffab7ba640 (LWP 103225) exited]
+[New Thread 0x7fffaafb9640 (LWP 103226)]
+[New Thread 0x7fffab7ba640 (LWP 103227)]
+[Thread 0x7fffaafb9640 (LWP 103226) exited]
+[Thread 0x7fffab7ba640 (LWP 103227) exited]
+[New Thread 0x7fffaafb9640 (LWP 103228)]
+[Thread 0x7fffaafb9640 (LWP 103228) exited]
+[New Thread 0x7fffab7ba640 (LWP 103229)]
+[Thread 0x7fffab7ba640 (LWP 103229) exited]
+[New Thread 0x7fffaafb9640 (LWP 103230)]
+[Thread 0x7fffaafb9640 (LWP 103230) exited]
+[New Thread 0x7fffaafb9640 (LWP 103231)]
+[New Thread 0x7fffab7ba640 (LWP 103232)]
+[Thread 0x7fffaafb9640 (LWP 103231) exited]
+[New Thread 0x7fffaafb9640 (LWP 103233)]
+[Thread 0x7fffab7ba640 (LWP 103232) exited]
+[New Thread 0x7fffab7ba640 (LWP 103234)]
+[Thread 0x7fffaafb9640 (LWP 103233) exited]
+[Thread 0x7fffab7ba640 (LWP 103234) exited]
+[New Thread 0x7fffaafb9640 (LWP 103235)]
+[Thread 0x7fffaafb9640 (LWP 103235) exited]
+[New Thread 0x7fffab7ba640 (LWP 103236)]
+[Thread 0x7fffab7ba640 (LWP 103236) exited]
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=39->40 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=40, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=40, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=40, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=40, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=40, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=40, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=40->41 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=41, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=41, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=41, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=41, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=41, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=41, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=41->42 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=42, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=42, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=42, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=42, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=42, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=42, priority=7)
+[ELECTION-G0-N0] >>> STARTING ELECTION <<< term=42->43 election_round=1 priority_rank=7/7 last_log_index=0 last_log_term=0
+[ELECTION-G0-N0] -> N1: Sent RequestVote(term=43, priority=7)
+[ELECTION-G0-N0] -> N2: Sent RequestVote(term=43, priority=7)
+[ELECTION-G0-N0] -> N3: Sent RequestVote(term=43, priority=7)
+[ELECTION-G0-N0] -> N4: Sent RequestVote(term=43, priority=7)
+[ELECTION-G0-N0] -> N5: Sent RequestVote(term=43, priority=7)
+[ELECTION-G0-N0] -> N6: Sent RequestVote(term=43, priority=7)
+
+[TIMESTAMP: 1779972072] [STORE-N0] GROUP LEADER MEMBER STATUS
+[New Thread 0x7fffab7ba640 (LWP 103237)]
+[New Thread 0x7fffaafb9640 (LWP 103238)]
+[Thread 0x7fffab7ba640 (LWP 103237) exited]
+[New Thread 0x7fffab7ba640 (LWP 103239)]
+[Thread 0x7fffaafb9640 (LWP 103238) exited]
+[Thread 0x7fffab7ba640 (LWP 103239) exited]
+[New Thread 0x7fffaafb9640 (LWP 103240)]
+[New Thread 0x7fffab7ba640 (LWP 103241)]
+[Thread 0x7fffab7ba640 (LWP 103241) exited]
+[Thread 0x7fffaafb9640 (LWP 103240) exited]
+[New Thread 0x7fffabfbb640 (LWP 103242)]
+[Thread 0x7fffabfbb640 (LWP 103242) exited]
+[New Thread 0x7fffabfbb640 (LWP 103244)]
+[Thread 0x7fffabfbb640 (LWP 103244) exited]
+[New Thread 0x7fffab7ba640 (LWP 103245)]
+[Thread 0x7fffab7ba640 (LWP 103245) exited]
+[New Thread 0x7fffab7ba640 (LWP 103246)]
+[Thread 0x7fffab7ba640 (LWP 103246) exited]
+[New Thread 0x7fffab7ba640 (LWP 103247)]
+[New Thread 0x7fffabfbb640 (LWP 103248)]
+[Thread 0x7fffab7ba640 (LWP 103247) exited]
+[New Thread 0x7fffab7ba640 (LWP 103249)]
+[Thread 0x7fffabfbb640 (LWP 103248) exited]
+[Thread 0x7fffab7ba640 (LWP 103249) exited]
+[New Thread 0x7fffab7ba640 (LWP 103250)]
+[Thread 0x7fffab7ba640 (LWP 103250) exited]
+[New Thread 0x7fffabfbb640 (LWP 103251)]
+[New Thread 0x7fffab7ba640 (LWP 103252)]
+[Thread 0x7fffabfbb640 (LWP 103251) exited]
+[Thread 0x7fffab7ba640 (LWP 103252) exited]
+[New Thread 0x7fffaafb9640 (LWP 103253)]
+[New Thread 0x7fffab7ba640 (LWP 103254)]
+[New Thread 0x7fffabfbb640 (LWP 103255)]
+[Thread 0x7fffab7ba640 (LWP 103254) exited]
+[Thread 0x7fffaafb9640 (LWP 103253) exited]
+[Thread 0x7fffabfbb640 (LWP 103255) exited]
+Exception ignored in: <gdb._GdbOutputFile object at 0x7c8a2c790ac0>
+Traceback (most recent call last):
+  File "/usr/share/gdb/python/gdb/__init__.py", line 47, in flush
+    def flush(self):
+KeyboardInterrupt: 

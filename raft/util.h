@@ -34,6 +34,13 @@ class Timer {
 };
 
 enum LogMsgType { kRPC = 1, kRaft = 2, kEc = 3 };
+
+enum LogLevel { DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3 };
+
+#ifndef LOG_LEVEL
+#define LOG_LEVEL INFO
+#endif
+
 class Logger {
   // Enable debug messages or not. False means all types
   // of messages will be ignored
@@ -58,6 +65,7 @@ class Logger {
   Logger() : startTimePoint_(std::chrono::steady_clock::now()) {}
 
   void Debug(LogMsgType type, const char *fmt, ...);
+  void LogWithLevel(LogLevel level, LogMsgType type, const char *fmt, ...);
 
   // Reset the start timepoint of this debugger
   void Reset();
@@ -98,7 +106,7 @@ struct AppendEntriesRPCPerfCounter final : public PerfCounter {
 
   std::string ToString() const override {
     char buf[512];
-    sprintf(buf, "[AppendEntriesPerfRPCCounter: transfer_size(%llu) time(%llu us)]",
+    sprintf(buf, "[AppendEntriesPerfRPCCounter: transfer_size(%lu) time(%lu us)]",
             this->transfer_size, this->pass_time);
     return std::string(buf);
   }
@@ -120,7 +128,7 @@ struct PersistencePerfCounter final : public PerfCounter {
 
   std::string ToString() const override {
     char buf[512];
-    sprintf(buf, "[PersistencePerfCounter: persist_size(%llu) time(%llu us)]", this->persist_size,
+    sprintf(buf, "[PersistencePerfCounter: persist_size(%lu) time(%lu us)]", this->persist_size,
             this->pass_time);
     return std::string(buf);
   }
@@ -142,8 +150,8 @@ struct RaftAppendEntriesProcessPerfCounter final : public PerfCounter {
   std::string ToString() const override {
     char buf[512];
     sprintf(buf,
-            "[RaftAppendEntriesProcessPerfCounter: process_size(%llu) "
-            "time(%llu us)]",
+            "[RaftAppendEntriesProcessPerfCounter: process_size(%lu) "
+            "time(%lu us)]",
             this->process_size, this->pass_time);
     return std::string(buf);
   }
@@ -167,7 +175,7 @@ struct EncodingEntryPerfCounter final : public PerfCounter {
     char buf[512];
     sprintf(buf,
             "[EncodingEntryPerfCounter]: encoding_parameters(k=%d m=%d) "
-            "time(%llu us)]",
+            "time(%lu us)]",
             this->encoding_k, this->encoding_m, this->pass_time);
     return std::string(buf);
   }
@@ -200,11 +208,25 @@ inline int64_t DurationToMicros(TimePoint start, TimePoint end) {
 Logger *LoggerInstance();
 PerfLogger *PerfLoggerInstance();
 }  // namespace util
+
 #define LOG(msg_type, format, ...)                  \
   {                                                 \
     auto logger = raft::util::LoggerInstance();     \
     logger->Debug(msg_type, format, ##__VA_ARGS__); \
   }
+
+#define LOG_IF_LEVEL(level, msg_type, format, ...)                    \
+  {                                                                   \
+    if (level >= LOG_LEVEL) {                                        \
+      auto logger = raft::util::LoggerInstance();                     \
+      logger->LogWithLevel(level, msg_type, format, ##__VA_ARGS__);   \
+    }                                                                 \
+  }
+
+#define LOG_DEBUG(msg_type, format, ...)   LOG_IF_LEVEL(raft::util::DEBUG, msg_type, format, ##__VA_ARGS__)
+#define LOG_INFO(msg_type, format, ...)    LOG_IF_LEVEL(raft::util::INFO, msg_type, format, ##__VA_ARGS__)
+#define LOG_WARN(msg_type, format, ...)    LOG_IF_LEVEL(raft::util::WARN, msg_type, format, ##__VA_ARGS__)
+#define LOG_ERROR(msg_type, format, ...)   LOG_IF_LEVEL(raft::util::ERROR, msg_type, format, ##__VA_ARGS__)
 
 #define PERF_LOG(perf_counter)                           \
   {                                                      \

@@ -27,31 +27,37 @@ enum ErrorType {
   kKVDecodeFail = 8,
 };
 
+// Sentinel value indicating no leader has been detected
+static constexpr raft::raft_node_id_t kNoDetectLeader = static_cast<raft::raft_node_id_t>(-1);
+
 struct Request {
   RequestType type;
   uint32_t client_id;
   uint32_t sequence;
+  raft::raft_group_id_t group_id;
   std::string key;
   std::string value;  // Ignore it if this request is not Put
-  void serialize(SF::Archive &ar) { ar &type &client_id &sequence &key &value; }
+  void serialize(SF::Archive &ar) { ar &type &client_id &sequence &group_id &key &value; }
 };
 
 struct Response {
   RequestType type;
   uint32_t client_id;
   uint32_t sequence;
+  raft::raft_group_id_t group_id;
   ErrorType err;
   raft::raft_term_t raft_term;
   std::string value;                     // Valid if type is Get
   int k, m;                              // The parameter needed to construct an original value
   raft::raft_index_t read_index;         // This is valid only when type is Get
   raft::raft_node_id_t reply_server_id;  // The id of server that makes this response
+  raft::raft_node_id_t leader_hint;      // Raft redirect hint: known leader for this group
   uint64_t apply_elapse_time;            // Time elapsed to apply this entry to state machine
   uint64_t commit_elapse_time;           // Time elapsed to commit a raft entry: From
                                          // proposal to append it into channel
   void serialize(SF::Archive &ar) {
-    ar &type &client_id &sequence &err &raft_term &value &k &m &read_index &reply_server_id
-        &apply_elapse_time &commit_elapse_time;
+    ar &type &client_id &sequence &group_id &err &raft_term &value &k &m &read_index &reply_server_id
+        &leader_hint &apply_elapse_time &commit_elapse_time;
   }
 };
 
@@ -59,7 +65,8 @@ struct Response {
 struct GetValueRequest {
   std::string key;
   raft::raft_index_t read_index;
-  void serialize(SF::Archive &ar) { ar &key &read_index; }
+  raft::raft_group_id_t group_id;
+  void serialize(SF::Archive &ar) { ar &key &read_index &group_id; }
 };
 
 struct GetValueResponse {

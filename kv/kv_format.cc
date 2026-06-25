@@ -127,4 +127,17 @@ void RaftEntryToRequest(const raft::LogEntry &ent, Request *request) {
   }
 }
 
+std::string FormatFullEntryValueForStorage(const std::string &user_value) {
+  std::string out;
+  char tmp_data[12];
+  *reinterpret_cast<int *>(tmp_data) = 1;
+  *reinterpret_cast<int *>(tmp_data + 4) = 0;
+  *reinterpret_cast<int *>(tmp_data + 8) = 0;
+  out.append(tmp_data, 12);
+  const size_t prefix_size = sizeof(int) + user_value.size();
+  out.resize(12 + prefix_size);
+  MakePrefixLengthKey(user_value, out.data() + 12);
+  return out;
+}
+
 }  // namespace kv

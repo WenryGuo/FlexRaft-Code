@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "log_entry.h"
 #include "raft_type.h"
 #include "type.h"
@@ -32,4 +34,7 @@ inline char *GetKeyFromPrefixLengthFormat(char *buf, std::string *key) {
   *key = std::string(buf + sizeof(int), key_size);
   return buf + sizeof(int) + key_size;
 }
+
+// Same on-disk value layout as RaftEntryToRequest() for kNormal (k=1 full object).
+std::string FormatFullEntryValueForStorage(const std::string &user_value);
 }  // namespace kv
